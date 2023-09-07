@@ -18,11 +18,21 @@ def run(session, as_of_date: dt.date) -> str:
     master_summary = ""
     prompt = app_settings.PROMPT_FOR_MASTER_SUMMARY
     start_date = get_start_date(as_of_date)
-    logger.info("Starting master summary generation process for all article with content summary..")
+    logger.info(
+        "Starting master summary generation process for all article with content summary.."
+    )
 
     # TODO: carefully select records based on date (take care of timezone)
-    articles = session.query(CryptonewsArticlesDump).filter(
-        and_(CryptonewsArticlesDump.date >= start_date, CryptonewsArticlesDump.content_summary != None)).all()
+    articles = (
+        session.query(CryptonewsArticlesDump)
+        .filter(
+            and_(
+                CryptonewsArticlesDump.date >= start_date,
+                CryptonewsArticlesDump.content_summary != None,
+            )
+        )
+        .all()
+    )
 
     all_content_summaries_list = [article.content_summary for article in articles]
     all_content_summaries = "\n".join(all_content_summaries_list)
@@ -43,10 +53,14 @@ def run(session, as_of_date: dt.date) -> str:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--as_of_date')
+    parser.add_argument("--as_of_date")
     args = parser.parse_args()
 
-    as_of_date = dt.datetime.strptime(args.as_of_date, "%Y-%m-%d") if args.as_of_date else dt.datetime.today()
+    as_of_date = (
+        dt.datetime.strptime(args.as_of_date, "%Y-%m-%d")
+        if args.as_of_date
+        else dt.datetime.today()
+    )
     as_of_date = as_of_date.date()
 
     with create_session() as session:

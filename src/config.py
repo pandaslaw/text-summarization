@@ -19,4 +19,3 @@ class AppSettings(BaseSettings):
 logger.info("Loading environment variables from .env file.")
 load_dotenv()
 app_settings = AppSettings()
-

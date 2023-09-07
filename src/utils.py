@@ -2,7 +2,10 @@ import datetime as dt
 
 from langchain.chains.summarize import load_summarize_chain
 from langchain.chat_models import ChatOpenAI
-from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
+from langchain.text_splitter import (
+    CharacterTextSplitter,
+    RecursiveCharacterTextSplitter,
+)
 from pandas.tseries.offsets import BDay
 
 
