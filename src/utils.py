@@ -18,7 +18,6 @@ def generate_summary(text: str, prompt: str) -> str:
     chain = load_summarize_chain(llm, chain_type="refine")
 
     content_summary = chain.run(texts)
-    # content_summary = "some res " + prompt[:20]
     return content_summary
 
 

@@ -120,7 +120,7 @@ def pull_articles(session, as_of_date: dt.date, tags: List[str] = None):
                 f"Total number of saved articles: {len(db_entities)}.\n")
 
 
-def pull_articles2(session, as_of_date):
+def pull_articles_stub(session, as_of_date):
     articles_metadata_list = [
         {
             "news_url": "https://cryptoslate.com/ftx-reorganizing-on-chain-assets-by-bridging-tokens-consolidating-holdings/",
@@ -175,4 +175,4 @@ if __name__ == "__main__":
     as_of_date = as_of_date.date()
 
     with create_session() as session:
-        pull_articles2(session, as_of_date)
+        pull_articles(session, as_of_date)

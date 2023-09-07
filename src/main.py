@@ -17,7 +17,7 @@ if __name__ == "__main__":
     with create_session() as session:
         articles = session.query(CryptonewsArticlesDump).all()
 
-        download_articles.pull_articles2(session, as_of_date)
+        download_articles.pull_articles(session, as_of_date)
         create_content_summary.run(session, as_of_date)
         master_summary = create_master_summary.run(session, as_of_date)
         logger.info(f"\nHere is generated Sundown Digest as of {as_of_date.isoformat()}:\n\n{master_summary}")
