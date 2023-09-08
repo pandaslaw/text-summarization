@@ -10,7 +10,7 @@ from loguru import logger
 from sqlalchemy import and_
 
 from src.config import app_settings
-from src.database import create_session, CryptonewsArticlesDump
+from src.database import create_session, CryptonewsArticlesDump, get_articles_by_summary
 from src.utils import generate_summary, get_start_date
 
 
@@ -23,16 +23,7 @@ def run(session, as_of_date: dt.date) -> str:
     )
 
     # TODO: carefully select records based on date (take care of timezone)
-    articles = (
-        session.query(CryptonewsArticlesDump)
-        .filter(
-            and_(
-                CryptonewsArticlesDump.date >= start_date,
-                CryptonewsArticlesDump.content_summary != None,
-            )
-        )
-        .all()
-    )
+    articles = get_articles_by_summary(session, start_date, empty_summary=False)
 
     all_content_summaries_list = [article.content_summary for article in articles]
     all_content_summaries = "\n".join(all_content_summaries_list)
@@ -64,5 +55,4 @@ if __name__ == "__main__":
     as_of_date = as_of_date.date()
 
     with create_session() as session:
-        articles = session.query(CryptonewsArticlesDump).all()
         run(session, as_of_date)

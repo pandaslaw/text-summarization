@@ -1,5 +1,8 @@
+import datetime as dt
+from typing import List
+
 from loguru import logger
-from sqlalchemy import Integer, DateTime
+from sqlalchemy import Integer, DateTime, and_
 from sqlalchemy import String
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
@@ -36,14 +39,57 @@ def create_session():
     return Session()
 
 
-def run():
+def get_articles(session, start_date: dt.date = None) -> List[CryptonewsArticlesDump]:
+    """Load CryptonewsArticlesDump objects from database."""
+
+    if start_date:
+        return (
+            session.query(CryptonewsArticlesDump)
+            .filter(CryptonewsArticlesDump.date >= start_date)
+            .all()
+        )
+    return session.query(CryptonewsArticlesDump).all()
+
+
+def get_articles_by_summary(session, start_date: dt.date, empty_summary: bool = True):
+    """Load CryptonewsArticlesDump objects from database."""
+
+    # TODO: carefully select records based on date (take care of timezone)
+    contrent_summary_condition = (
+        CryptonewsArticlesDump.content_summary != None
+        if not empty_summary
+        else CryptonewsArticlesDump.content_summary == None
+    )
+    return (
+        session.query(CryptonewsArticlesDump)
+        .filter(
+            and_(CryptonewsArticlesDump.date >= start_date, contrent_summary_condition)
+        )
+        .all()
+    )
+
+
+def save_articles_to_db(session, cryptonews_articles: List[CryptonewsArticlesDump]):
+    """Insert list of CryptonewsArticlesDump objects to database."""
+
+    for article in cryptonews_articles:
+        q = session.query(CryptonewsArticlesDump.id).filter(
+            CryptonewsArticlesDump.news_url == article.news_url
+        )
+        is_already_in_db = session.query(q.exists()).scalar()
+        if not is_already_in_db:
+            session.add(article)
+    session.commit()
+
+
+def run(drop_table: bool = False):
     engine = create_engine(app_settings.DATABASE_URL)
-    # CryptonewsArticlesDump.__table__.drop(engine)
+    if drop_table:
+        CryptonewsArticlesDump.__table__.drop(engine)
 
     logger.info("Create tables in the database (if they don't exist).")
     Base.metadata.create_all(engine)
     logger.info("Success.")
 
 
-if __name__ == "__main__":
-    run()
+run(drop_table=False)

@@ -7,10 +7,9 @@ import argparse
 import datetime as dt
 
 from loguru import logger
-from sqlalchemy import and_
 
 from src.config import app_settings
-from src.database import create_session, CryptonewsArticlesDump
+from src.database import create_session, get_articles_by_summary
 from src.utils import generate_summary, get_start_date
 
 
@@ -21,17 +20,7 @@ def run(session, as_of_date: dt.date):
         "Starting summary generation process for each article with no content summary.."
     )
 
-    # TODO: carefully select records based on date (take care of timezone)
-    articles = (
-        session.query(CryptonewsArticlesDump)
-        .filter(
-            and_(
-                CryptonewsArticlesDump.date >= start_date,
-                CryptonewsArticlesDump.content_summary == None,
-            )
-        )
-        .all()
-    )
+    articles = get_articles_by_summary(session, start_date, empty_summary=True)
 
     for article in articles:
         article.content_summary = generate_summary(article.body, prompt)

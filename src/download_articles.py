@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from loguru import logger
 
 from src.config import app_settings
-from src.database import create_session, CryptonewsArticlesDump
+from src.database import create_session, CryptonewsArticlesDump, save_articles_to_db
 from src.utils import get_start_date
 
 
@@ -60,20 +60,20 @@ def create_cryptonews_article_db_entity(
     return article
 
 
-def save_articles_to_db(session, cryptonews_articles: List[CryptonewsArticlesDump]):
-    """Insert list of CryptonewsArticlesDump objects to database."""
+def pull_articles(session, as_of_date: dt.date, tags: List[str] = None, test=False):
+    """
+    Collects all news articles according to tag as of previous business day through API and saves data to db.
 
-    for article in cryptonews_articles:
-        q = session.query(CryptonewsArticlesDump.id).filter(
-            CryptonewsArticlesDump.news_url == article.news_url
-        )
-        is_already_in_db = session.query(q.exists()).scalar()
-        if not is_already_in_db:
-            session.add(article)
-    session.commit()
+    Tags feature is not available yet.
+    """
+
+    if test:
+        pull_articles_stub(session, as_of_date)
+    else:
+        pull_articles_from_api(session, as_of_date, tags)
 
 
-def pull_articles(session, as_of_date: dt.date, tags: List[str] = None):
+def pull_articles_from_api(session, as_of_date: dt.date, tags: List[str] = None):
     """
     Collects all news articles according to tag as of previous business day through API and saves data to db.
 
@@ -193,4 +193,4 @@ if __name__ == "__main__":
     as_of_date = as_of_date.date()
 
     with create_session() as session:
-        pull_articles(session, as_of_date)
+        pull_articles(session, as_of_date, test=False)

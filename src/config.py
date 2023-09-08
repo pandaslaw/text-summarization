@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 from loguru import logger
-from pydantic import BaseSettings
+from pydantic.v1 import BaseSettings
 
 
 class AppSettings(BaseSettings):
