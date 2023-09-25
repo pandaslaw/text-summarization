@@ -26,7 +26,7 @@ def run(session, as_of_date: dt.date) -> str:
     articles = get_articles_by_summary(session, start_date, empty_summary=False)
 
     all_content_summaries_list = [article.content_summary for article in articles]
-    all_content_summaries = "\n".join(all_content_summaries_list)
+    all_content_summaries = "\n\n".join(all_content_summaries_list)
 
     if all_content_summaries:
         master_summary = articles[0].master_summary
