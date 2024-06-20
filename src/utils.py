@@ -1,10 +1,12 @@
 import datetime as dt
 import os
+import time
 
 import requests
-from langchain import PromptTemplate
+from langchain import HuggingFaceHub, PromptTemplate
 from langchain.chains.summarize import load_summarize_chain
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatOpenAI, ChatAnthropic
+from langchain.schema import HumanMessage
 from langchain.text_splitter import (
     CharacterTextSplitter,
     RecursiveCharacterTextSplitter,
@@ -65,12 +67,17 @@ def get_huggingface_response_inference(article_text: str, prompt: str, model: st
     # Make the API request
     response = requests.post(api_url, headers=app_settings.HUGGINGFACE_HEADERS, json={"inputs": full_prompt})
 
-    if response.status_code == 200:
-        response_json = response.json()[0]
-        result = response_json.get("summary_text")
-        result = result if result else response_json.get("generated_text")
-        summary = result if result else response_json.get("translation_text")
-        return summary
+    counter = 0
+    while counter < 10:
+        if response.status_code == 200:
+            response_json = response.json()[0]
+            result = response_json.get("summary_text")
+            result = result if result else response_json.get("generated_text")
+            summary = result if result else response_json.get("translation_text")
+            return summary
+        time.sleep(10)
+        counter += 1
+        print(f"Failed to get summary: {response.status_code} {response.text}. Retrying..")
     else:
         raise Exception(f"Failed to get summary: {response.status_code} {response.text}")
 
