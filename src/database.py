@@ -2,7 +2,7 @@ import datetime as dt
 from typing import List
 
 from loguru import logger
-from sqlalchemy import Integer, DateTime, and_
+from sqlalchemy import Integer, Date, and_
 from sqlalchemy import String
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
@@ -23,7 +23,7 @@ class CryptonewsArticlesDump(Base):
     title = mapped_column(String, nullable=False)
     text = mapped_column(String, nullable=True)
     source_name = mapped_column(String, nullable=True)
-    date = mapped_column(DateTime, nullable=True)
+    date = mapped_column(Date, nullable=True)
     topics = mapped_column(String, nullable=True)
     sentiment = mapped_column(String, nullable=True)
     content_type = mapped_column(String, nullable=True)

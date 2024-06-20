@@ -9,11 +9,9 @@ black
 SQLAlchemy
 beautifulsoup4
 pandas
-psycopg2
 torch
 transformers
 accelerate
 SentencePiece
 langchain
 streamlit
-psycopg2

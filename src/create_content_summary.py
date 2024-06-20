@@ -10,7 +10,7 @@ from loguru import logger
 
 from src.config import app_settings
 from src.database import create_session, get_articles_by_summary
-from src.utils import generate_summary, get_start_date
+from src.utils import generate_summary, get_start_date, generate_summary_huggingface
 
 
 def run(session, as_of_date: dt.date):
@@ -23,7 +23,7 @@ def run(session, as_of_date: dt.date):
     articles = get_articles_by_summary(session, start_date, empty_summary=True)
 
     for article in articles:
-        article.content_summary = generate_summary(article.body, prompt)
+        article.content_summary = generate_summary_huggingface(article.body, prompt)
 
     session.commit()
     logger.info("Completed.\n")

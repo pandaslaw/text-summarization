@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from loguru import logger
 
 from src.config import app_settings
-from src.database import create_session, CryptonewsArticlesDump, save_articles_to_db
+from src.database import create_session, CryptonewsArticlesDump, save_articles_to_db, get_articles
 from src.utils import get_start_date
 
 
@@ -42,7 +42,7 @@ def create_cryptonews_article_db_entity(
     """Create database entry."""
 
     date_str = metadata.get("date")
-    datetime_obj = dt.datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z")
+    datetime_obj = dt.datetime.fromisoformat(date_str)
 
     # TODO: assign tags
     article = CryptonewsArticlesDump(
@@ -133,6 +133,8 @@ def pull_articles_from_api(session, as_of_date: dt.date, tags: List[str] = None)
 
 
 def pull_articles_stub(session, as_of_date):
+    as_of_date_str = as_of_date.isoformat()
+
     articles_metadata_list = [
         {
             "news_url": "https://cryptoslate.com/ftx-reorganizing-on-chain-assets-by-bridging-tokens-consolidating-holdings/",
@@ -140,7 +142,7 @@ def pull_articles_stub(session, as_of_date):
             "title": "FTX reorganizing on-chain assets by bridging tokens, consolidating holdings",
             "text": "Bankrupt crypto exchange FTX revealed in a tweet on Sept. 6 that it is in the process of moving its cryptocurrency holdings.",
             "source_name": "CryptoSlate",
-            "date": "Wed, 06 Sep 2023 18:51:16 -0400",
+            "date": as_of_date_str,
             "topics": [],
             "sentiment": "Neutral",
             "type": "Article",
@@ -151,7 +153,7 @@ def pull_articles_stub(session, as_of_date):
             "title": "Factors for a Profitable Cryptocurrency Investment",
             "text": "Currently, a lot of people want to invest in cryptocurrencies. However, before diving in, it's essential to consider several variables that can influence your investment decisions. Choosing the right cryptocurrency is crucial; you can opt for well-established ones, but they often require substantial financial commitments due to their high costs.",
             "source_name": "Crypto Reporter",
-            "date": "Wed, 06 Sep 2023 18:24:52 -0400",
+            "date": as_of_date_str,
             "topics": [],
             "sentiment": "Positive",
             "type": "Article",
@@ -162,7 +164,7 @@ def pull_articles_stub(session, as_of_date):
             "title": "Krafton Leaps into Blockchain With Settlus: A Game-Changer for Content Creators?",
             "text": "Krafton, the South Korean video game giant best known for hits like PUBG: Battlegrounds, is stepping into the blockchain arena.",
             "source_name": "Bitcoinworld",
-            "date": "Wed, 06 Sep 2023 18:20:55 -0400",
+            "date": as_of_date_str,
             "topics": [],
             "sentiment": "Positive",
             "type": "Article",

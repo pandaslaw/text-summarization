@@ -9,7 +9,7 @@ class AppSettings(BaseSettings):
         env_file_encoding = "utf-8"
 
     OPENAI_API_KEY: str
-    HUGGINGFACE_API_KEY: str
+    HUGGINGFACEHUB_API_TOKEN: str
     CRYPTONEWS_API_KEY: str
     DATABASE_URL: str
     PROMPT_FOR_CONTENT_SUMMARY: str
