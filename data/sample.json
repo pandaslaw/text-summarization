@@ -1,0 +1,87 @@
+[
+   {
+      "body":"Bitcoin mining pool F2Pool has returned 19.8 bitcoin (BTC) to Paxos after the crypto services firm paid a $520,000 fee on a transaction worth just $2,000 earlier this week. Paxos said the overpayment was due to a \"bug\" in the corporate operations side of business. Bitcoin fees are typically no more than $20 per transaction. Blockchain data shows the funds were returned to Paxos on Friday. A bitcoin fee is what miners receive after a transaction is confirmed on the Bitcoin blockchain. Fees can be adjusted by the user to give certain transactions priority over others. \"After conducting identity verification, we have confirmed the ownership of these BTC, and fully refunded the fee to the sender,\" F2Pool wrote on X . The refund comes after intense discussion amongst the bitcoin community, with the likes of Stake.fish founder Chun Wang saying that he \"regretted\" agreeing to a refund with Paxos. Casa Hodl co-founder and early bitcoin developer Jameson Lopp praised Bitcoin as being a \"cooperative network\" after the fee was returned. \"Bitcoin is an adversarial network, but on the flip side it's also a cooperative network,\" Lopp wrote on X . \"Miners are humans too, and they realize that people make mistakes. While retaining egregious transaction fees makes for a nice short-term profit, returning those funds is the humane decision.\"",
+      "created_at":"Fri, 15 Sep 2023 12:40:32 GMT",
+      "crypto_news_api_description":"Paxos paid $520,000 for a $2,000 bitcoin transaction earlier this week.",
+      "crypto_news_api_sentiment":"Positive",
+      "crypto_news_api_title":"Bitcoin Miner F2Pool Returns 19.8 BTC to Paxos After Overpaid Fee",
+      "crypto_news_api_topics":"{mining}",
+      "id":1,
+      "news_date":"Fri, 15 Sep 2023 00:00:00 GMT",
+      "source":"Coindesk",
+      "subtitle":"Paxos paid $520,000 for a $2,000 bitcoin transaction earlier this week.",
+      "tickers":[
+         "BTC"
+      ],
+      "title":"Bitcoin Miner F2Pool Returns 19.8 BTC to Paxos After Overpaid Fee",
+      "url":"https://www.coindesk.com/business/2023/09/15/bitcoin-miner-f2pool-returns-198-btc-to-paxos-after-overpaid-fee/"
+   },
+   {
+      "body":"The Bitcoin ( BTC ) miner who received the 19.8 BTC in fees has returned the funds to blockchain infrastructure firm Paxos, after its claims that the company made the mistake of paying over $500,000 in BTC transfer fees. On Sept. 10, the crypto community was puzzled after seeing a BTC transaction that paid around $500,000 in fees to move around $2,000, while the average network fee was around $2. Various speculations were raised, with some believing that the transaction was done by copy-pasting data and accidentally pasting an output into the fee box without double-checking. On Sept. 13, Paxos announced that it was their server that made the transfer. Following its claim, the company assured its users that their funds were safe and that the funds belonged to Paxos . The company also clarified that PayPal was not involved in the mistake and admitted that the error was its own. Almost a day after Paxos\u2019 claims, the Bitcoin miner who received the funds went on X (formerly Twitter) to express frustrations after agreeing to refund the amount to Paxos. The miner asked their X followers what they would do in his stead, and a majority voted to just distribute the money to other Bitcoin miners. However, this advice doesn't appear to have been taken. Blockchain data shared by Bitcoin explorer Mempool confirmed that the funds were indeed returned on Sept. 15. Related: How to strike a balance between blockchain transparency and privacy: Nansen CEO Thousands of dollars in transaction fee mistakes have been lost before. Back in 2019, an Ethereum user lost almost $400,000 in Ether ( ETH ) after making the mistake of pasting values in the wrong fields. Luckily, the Ethereum mining pool Sparkpool helped the user recover half of the funds lost. Magazine: NFT collapse and monster egos feature in new Murakami exhibition",
+      "created_at":"Fri, 15 Sep 2023 12:40:32 GMT",
+      "crypto_news_api_description":"Bitcoin explorer Mempool shared blockchain data that confirmed the funds were sent back on Sept. 15.",
+      "crypto_news_api_sentiment":"Positive",
+      "crypto_news_api_title":"Miner returns over $500k in BTC transaction fee overpayment to Paxos",
+      "crypto_news_api_topics":"{mining,pricemovement}",
+      "id":2,
+      "news_date":"Fri, 15 Sep 2023 00:00:00 GMT",
+      "source":"Cointelegraph",
+      "subtitle":"Bitcoin explorer Mempool shared blockchain data that confirmed the funds were sent back on Sept. 15.",
+      "tickers":[
+         "BTC"
+      ],
+      "title":"Miner returns over $500k in BTC transaction fee overpayment to Paxos",
+      "url":"https://cointelegraph.com/news/miner-returns-over-500k-btc-transaction-fee-overpayment-paxos"
+   },
+   {
+      "body":"Bitcoin ( BTC ) consolidated higher on Sep. 15 as analysis described recent BTC price behavior as \u201ctextbook.\u201d Data from Cointelegraph Markets Pro and TradingView showed the largest cryptocurrency focusing on $26,600 \u2014 below a key breakout level. Bitcoin had shrugged off the latest United States macroeconomic data reports the day prior, joining traditional markets in heading higher despite hints that inflation was more stubborn than expected. Amid a renewed bullish mood, Michae\u0308l van de Poppe, founder and CEO of trading firm Eight, was hopeful that BTC/USD would avoid new lows. \u201cBitcoin might be able to activate a potential bullish breakout, although we need to make sure that it doesn't retest the lows again,\u201d he wrote in part of a dedicated post on X (formerly Twitter) on Sep. 14. Referencing news that Germany\u2019s largest lender, Deutsche Bank, had applied for a crypto custody licence , Van de Poppe eyed $25,000 as a level for bulls to steer the market away from. \u201cWe've seen a sweep at $25,000 and should be holding up on higher numbers. In that case, we should be holding $25,600-25,900 as beneath there we'll see a ton of stops to be activated before we can actually see some movements,\u201d he suggested. Despite remaining below a cluster of key moving averages (MAs), the 200-week exponential moving average (EMA) continues to act as support \u2014 reclaimed in March and an important feature at the start of any bull market. \u201cI think that the odds of the low to be in on this cycle have increased. Why? Well, we're again holding above the 200-Week EMA and most likely will be closing above that again for this one,\u201d Van de Poppe continued. He highlighted $26,800 \u2014 the previous day\u2019s high \u2014 as the line in the sand to break through. Taking an optimistic long-range view, meanwhile, trading resource Stockmoney Lizards likewise concluded that further BTC price upside should come next. Related: Bitcoin price can hit $46K by 2024 halving \u2014 Interview with Filbfilb X analysis compared the past year\u2019s price action to an extended \u201caccumulation\u201d phase, using the Wyckoff method . This describes price cycles of an asset, and correctly identifying the trigger after a swing low, known as the \u201cSpring\u201d in Wyckoff, can reveal the beginning of a new uptrend or a return to a previous higher trading range. For Stockmoney Lizards, the Spring occurred after BTC/USD bottomed out in late 2022. \u201cWe have seen the spring in January, breakout end of March, and now the second throwback. Textbook Wyckoff behaviour,\u201d it commented. Collect this article as an NFT to preserve this moment in history and show your support for independent journalism in the crypto space.",
+      "created_at":"Fri, 15 Sep 2023 12:40:32 GMT",
+      "crypto_news_api_description":"Bitcoin analysis increasingly believes that this cycle's BTC price lows are done and dusted.",
+      "crypto_news_api_sentiment":"Positive",
+      "crypto_news_api_title":"BTC price shows 'textbook' Wyckoff moves as Bitcoin bulls defend $25K",
+      "crypto_news_api_topics":"{pricemovement}",
+      "id":3,
+      "news_date":"Fri, 15 Sep 2023 00:00:00 GMT",
+      "source":"Cointelegraph",
+      "subtitle":"Bitcoin analysis increasingly believes that this cycle's BTC price lows are done and dusted.",
+      "tickers":[
+         "BTC"
+      ],
+      "title":"BTC price shows 'textbook' Wyckoff moves as Bitcoin bulls defend $25K",
+      "url":"https://cointelegraph.com/news/btc-price-textbook-wyckoff-bitcoin-bulls-defend-25k"
+   },
+   {
+      "body":"As bitcoin (BTC) moves higher, the recently shorted alternative cryptocurrencies like solana's SOL may see leverage liquidations and exaggerated price rallies. Since Monday's brief move below crucial support at $25,000, bitcoin has risen over 6% to trade near $26,600 at press time, CoinDesk data show. Upbeat China August retail sales and factory output data released early Friday revived risk sentiment in financial markets, clearing the way for continued price gains in the leading cryptocurrencies. Alternative cryptocurrencies like XRP, Ether (ETH), SOL, Tron's TRX, Dogecoin (DOGE) and are tracking bitcoin higher, as they usually do. The altcoin bounce comes days after traders sold these tokens, pricing in the possibility of defunct exchange FTX securing approval from the bankruptcy court to sell assets from its multi-billion dollar cryptocurrency holdings. SOL fell over 8% on Monday, leading the decline in altcoins after a court filing showed FTX's solana holdings at $1.6 billion. The recovery puts altcoin bears, who took leveraged bearish bets on SOL and other tokens on fears of potential FTX creditor selling, at risk of liquidation. Exchanges liquidate positions when the market moves against a trader's bets, leading to margin shortage and the trader fails to provide additional margin. Potential forced liquidation of shorts will likely bring additional bullish pressures for SOL's price, leading to a short squeeze-led rally. \"The biggest near-term risk (pain trade) is a positive one: short-covering of altcoins leading to leveraged liquidations driving up the entire complex. SOL is a good one to watch, for example,\" Ilan Solot, co-head of digital assets at Marex Solutions, said in an email. Since Monday, funding rates in perpetual futures have been consistently negative. Funding rates represent cost of holding long and short positions in perpetual futures. A positive rate implies leverage is skewed on the bullish side while a negative rate indicates otherwise. Open interest or the dollar value locked in active perpetual futures tied to SOL has increased by over 16% to a one-month high of $338 million, according to Coinglass. The combination of rising open interest and negative funding rates suggests traders have recently raised bearish bets in SOL.",
+      "created_at":"Fri, 15 Sep 2023 12:40:32 GMT",
+      "crypto_news_api_description":"Bitcoin's bounce amid fears of FTX creditor liquidation might shake out altcoin bears, leading to a sharp rally in recently shorted tokens like solana.",
+      "crypto_news_api_sentiment":"Positive",
+      "crypto_news_api_title":"Bitcoin Bounce Puts Altcoin Bears at Risk",
+      "crypto_news_api_topics":"{}",
+      "id":4,
+      "news_date":"Fri, 15 Sep 2023 00:00:00 GMT",
+      "source":"Coindesk",
+      "subtitle":"Bitcoin's bounce amid fears of FTX creditor liquidation might shake out altcoin bears, leading to a sharp rally in recently shorted tokens like solana.",
+      "tickers":[
+         "BTC"
+      ],
+      "title":"Bitcoin Bounce Puts Altcoin Bears at Risk",
+      "url":"https://www.coindesk.com/markets/2023/09/15/bitcoin-bounce-puts-altcoin-bears-at-risk/"
+   },
+   {
+      "body":"Elon Musk said in 2021 that Tesla would accept Bitcoin payments once miners were using roughly 50% clean energy sources \u201cwith positive future trend\u201d \u2014 a benchmark that may have recently been met. In a Sept. 14 thread on X (formerly Twitter), Bloomberg analyst Jamie Coutts reported the percentage of Bitcoin ( BTC ) mining energy coming from renewable sources had exceeded 50% with \u201cfalling emissions plus a dramatically rising hash rate.\u201d According to Coutts, the push toward renewable energy sources was the result of miners dispersing from China in the wake of the country\u2019s mining ban starting in 2021, as well as certain nations turning to mining to \u201cmonetize stranded and excess energy.\u201d Countries investing in BTC mining include El Salvador \u2014 which has also recognized the cryptocurrency as legal tender since 2021 \u2014 Bhutan, Oman and the United Arab Emirates. The 50% energy benchmark could mean a greater move toward adoption by one of the biggest companies in the world. Related: Tesla\u2019s diamond hands: EV maker's Bitcoin holdings see no change in Q2 Musk \u2014 the CEO of Tesla, owner of X and founder of SpaceX \u2014 announced Tesla would stop accepting BTC payments in May 2021, citing the \u201crapidly increasing use of fossil fuels for Bitcoin mining and transactions\u201d at the time. Since establishing a sustainable energy source threshold of 50% for when the firm would resume payments, Musk acknowledged that there was a positive trend toward green energy sources but hasn\u2019t changed Tesla\u2019s policy. The Tesla CEO did not appear to have publicly announced any move to resume BTC payments. At the time of publication, the price of Bitcoin was $26,572, having risen more than 2% in the last seven days. Magazine: Bitcoin is on a collision course with \u2018Net Zero\u2019 promises",
+      "created_at":"Fri, 15 Sep 2023 12:40:32 GMT",
+      "crypto_news_api_description":"A Bloomberg analyst reported the percentage of energy used for Bitcoin mining coming from renewable sources had exceeded 50% due in part to miners fleeing China's ban.",
+      "crypto_news_api_sentiment":"Positive",
+      "crypto_news_api_title":"Bitcoin clean energy usage reportedly exceeds 50% \u2014 Will Tesla start accepting BTC payments?",
+      "crypto_news_api_topics":"{}",
+      "id":5,
+      "news_date":"Thu, 14 Sep 2023 00:00:00 GMT",
+      "source":"Cointelegraph",
+      "subtitle":"A Bloomberg analyst reported the percentage of energy used for Bitcoin mining coming from renewable sources had exceeded 50% due in part to miners fleeing China\u2019s ban.",
+      "tickers":[
+         "BTC"
+      ],
+      "title":"Bitcoin clean energy usage reportedly exceeds 50% \u2014 Will Tesla start accepting BTC payments?",
+      "url":"https://cointelegraph.com/news/bitcoin-clean-energy-usage-exceeds-50-percent-tesla-accepting-btc-payments"
+   }
+]
