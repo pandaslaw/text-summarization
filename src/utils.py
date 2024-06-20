@@ -1,17 +1,19 @@
 import datetime as dt
 import os
 
-from langchain import HuggingFaceHub, LLMChain, PromptTemplate
-from langchain.chains import StuffDocumentsChain
+import requests
+from langchain import PromptTemplate
 from langchain.chains.summarize import load_summarize_chain
-from langchain.chat_models import ChatOpenAI, ChatAnthropic
-from langchain.schema import HumanMessage
+from langchain.chat_models import ChatOpenAI
 from langchain.text_splitter import (
     CharacterTextSplitter,
     RecursiveCharacterTextSplitter,
 )
 from pandas.tseries.offsets import BDay
 from transformers import pipeline, AutoTokenizer
+
+from src.config import app_settings
+
 
 def generate_summary(text: str, prompt: str) -> str:
     full_prompt = f"{prompt}\n\n{text}"
@@ -27,21 +29,57 @@ def generate_summary(text: str, prompt: str) -> str:
     content_summary = chain.run(texts)
     return content_summary
 
-def generate_summary_huggingface(text: str, prompt: str) -> str:
-    full_prompt = f"{prompt}\n\n'''{text}'''"
-    model = "meta-llama/Llama-2-7b-chat-hf"
+
+def generate_summary_huggingface(article_text: str, prompt: str, use_inference: bool = True) -> str:
+    # model = "meta-llama/Llama-2-7b-chat-hf"
+    # model = "facebook/bart-large-cnn"
+    model = "t5-large"
+    # model = "google/long-t5-local-base"
     start_time = dt.datetime.now()
-    content_summary = get_huggingface_response(model, prompt=full_prompt, task="text-generation")
+
+    # using HuggingFace Inference API is faster than downloading a model
+    if use_inference:
+        content_summary = get_huggingface_response_inference(article_text, prompt, model)
+    else:
+        response = get_huggingface_response(article_text, prompt, model, task="text-generation")
+        content_summary = response[0]["generated_text"]
+
     print((dt.datetime.now() - start_time))
     print("GENERATED SUMMARY:", content_summary)
 
-    return content_summary[0]["generated_text"]
+    return content_summary
 
 
-def get_huggingface_response(model, prompt: str, task: str = "summarization", prefix: str = "") -> None:
+def get_huggingface_response_inference(article_text: str, prompt: str, model: str) -> str:
+    api_url = f"https://api-inference.huggingface.co/models/{model}"
+
+    # Define the prompt template
+    prompt_template = PromptTemplate(
+        input_variables=["article"],
+        template=prompt + "\n\n{article}\n\nSummary:"
+    )
+
+    # Create a prompt using the template
+    full_prompt = prompt_template.format(article=article_text)
+
+    # Make the API request
+    response = requests.post(api_url, headers=app_settings.HUGGINGFACE_HEADERS, json={"inputs": full_prompt})
+
+    if response.status_code == 200:
+        response_json = response.json()[0]
+        result = response_json.get("summary_text")
+        result = result if result else response_json.get("generated_text")
+        summary = result if result else response_json.get("translation_text")
+        return summary
+    else:
+        raise Exception(f"Failed to get summary: {response.status_code} {response.text}")
+
+
+def get_huggingface_response(article_text: str, prompt: str, model: str, task: str = "summarization", prefix: str = ""):
+    full_prompt = f"{prompt}\n\n'''{article_text}'''"
     tokenizer = AutoTokenizer.from_pretrained(model)
     if prefix:
-        prompt = f"{prefix}{prompt}"
+        full_prompt = f"{prefix}{full_prompt}"
 
     hf_pipeline = pipeline(
         task,  # LLM task
@@ -50,7 +88,7 @@ def get_huggingface_response(model, prompt: str, task: str = "summarization", pr
         device_map="auto",
     )
     sequences = hf_pipeline(
-        prompt,
+        full_prompt,
         do_sample=True,
         top_k=10,
         num_return_sequences=1,

@@ -9,9 +9,6 @@ black
 SQLAlchemy
 beautifulsoup4
 pandas
-torch
 transformers
-accelerate
-SentencePiece
 langchain
 streamlit

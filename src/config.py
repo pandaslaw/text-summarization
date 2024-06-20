@@ -9,7 +9,8 @@ class AppSettings(BaseSettings):
         env_file_encoding = "utf-8"
 
     OPENAI_API_KEY: str
-    HUGGINGFACEHUB_API_TOKEN: str
+    HUGGINGFACE_API_KEY: str
+    HUGGINGFACE_HEADERS: dict = None
     CRYPTONEWS_API_KEY: str
     DATABASE_URL: str
     PROMPT_FOR_CONTENT_SUMMARY: str
@@ -19,3 +20,4 @@ class AppSettings(BaseSettings):
 logger.info("Loading environment variables from .env file.")
 load_dotenv()
 app_settings = AppSettings()
+app_settings.HUGGINGFACE_HEADERS = {"Authorization": f"Bearer {app_settings.HUGGINGFACE_API_KEY}"}
