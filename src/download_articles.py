@@ -42,7 +42,7 @@ def create_cryptonews_article_db_entity(
     """Create database entry."""
 
     date_str = metadata.get("date")
-    datetime_obj = dt.datetime.fromisoformat(date_str)
+    datetime_obj = dt.datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %z')
 
     # TODO: assign tags
     article = CryptonewsArticlesDump(
