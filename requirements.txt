@@ -10,5 +10,6 @@ SQLAlchemy
 beautifulsoup4
 pandas
 transformers
-langchain
 streamlit
+psycopg2
+langchain_community

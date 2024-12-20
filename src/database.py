@@ -34,7 +34,7 @@ class CryptonewsArticlesDump(Base):
 
 
 def create_session():
-    engine = create_engine(app_settings.DATABASE_URL)
+    engine = create_engine(app_settings.DB_CONNECTION_STRING)
     Session = sessionmaker(bind=engine)
     return Session()
 
@@ -83,7 +83,7 @@ def save_articles_to_db(session, cryptonews_articles: List[CryptonewsArticlesDum
 
 
 def run(drop_table: bool = False):
-    engine = create_engine(app_settings.DATABASE_URL)
+    engine = create_engine(app_settings.DB_CONNECTION_STRING)
     if drop_table:
         CryptonewsArticlesDump.__table__.drop(engine)
 
