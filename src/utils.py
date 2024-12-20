@@ -2,8 +2,10 @@ import datetime as dt
 import os
 import time
 from logging import getLogger
+from typing import Dict, List
 
 import requests
+import tiktoken
 from langchain.chains.summarize import load_summarize_chain
 from langchain.text_splitter import (
     CharacterTextSplitter,
@@ -128,7 +130,7 @@ def get_huggingface_response(
     return sequences
 
 
-def summarize_article(
+def summarize_text(
     article_text: str,
     system_prompt: str,
 ) -> str:
@@ -137,21 +139,84 @@ def summarize_article(
     Language model and system prompt are specified in .env configuration file.
     """
     if not article_text:
-        logger.info("Article input is empty. SKIPPING")
+        logger.info("Article text is empty. SKIPPING")
         return ""
 
     model = app_settings.LANGUAGE_MODEL
-
     start_time = dt.datetime.now()
 
-    logger.info(
-        f"USER PROMPT (user input, the message that is sent to LLM): '{article_text[:15]}...'"
-    )
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": article_text},
-    ]
+    full_prompt = f"{system_prompt}\n\n{article_text}"
+    if len(full_prompt) > 128000:
+        # Step 1: Split the article into manageable chunks
+        chunk_size = get_chunk_size(article_text, app_settings.LANGUAGE_MODEL)
+        text_splitter = CharacterTextSplitter(
+            chunk_size=chunk_size, chunk_overlap=chunk_size // 10
+        )
+        chunks = text_splitter.split_text(article_text)
 
+        chunk_summaries = []
+
+        # Step 2: Generate summaries for each chunk
+        for chunk in chunks:
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": chunk},
+            ]
+            logger.info("Generating summary for chunk...")
+            chunk_summary = make_openai_client_api_call(messages, model)
+            if not chunk_summary:
+                message = f"Failed to create summary for chunk: '{chunk[:15] if chunk and len(chunk) > 15 else chunk}...'"
+                logger.error(message, exc_info=True)
+                raise Exception(message)
+            chunk_summaries.append(chunk_summary)
+
+        # Step 3: Combine chunk summaries into one text for final refinement
+        combined_summaries = " ".join(chunk_summaries)
+
+        # Step 4: Refine the combined summaries into a concise overall summary
+        refinement_prompt = (
+            "You are an expert at summarizing information concisely for business users. "
+            "Refine the following summaries into one clear, concise, and readable summary: "
+            f"{combined_summaries}"
+        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": refinement_prompt},
+        ]
+
+        try:
+            logger.info("Refining overall summary...")
+            output = make_openai_client_api_call(messages, model)
+
+        except Exception as e:
+            logger.error(f"Error during refinement: {e}", exc_info=True)
+            return ""
+    else:
+        logger.info(
+            f"Prompt size is less than number of allowed tokens, "
+            f"so creating summary without breaking into chunks."
+        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": article_text},
+        ]
+        output = make_openai_client_api_call(messages, model)
+
+    running_secs = (dt.datetime.now() - start_time).microseconds
+    logger.info(f"Answer generation took {running_secs / 100000:.2f} seconds.")
+    return output
+
+
+def make_openai_client_api_call(messages: List[Dict[str, str]], model: str) -> str:
+    start_time = dt.datetime.now()
+
+    article_text = messages[0].get("content")
+    article_text_preview = (
+        article_text[:15] if article_text and len(article_text) > 15 else article_text
+    )
+    logger.info(
+        f"USER PROMPT (preview of article text that is going to be sent to LLM): '{article_text_preview}...'"
+    )
     logger.info("Generating LLM response... ")
 
     if app_settings.DEBUG_MODE:
@@ -202,7 +267,6 @@ def summarize_article(
     running_secs = (dt.datetime.now() - start_time).microseconds
     logger.info(f"Answer generation took {running_secs / 100000:.2f} seconds.")
     logger.info(f"\nLLM'S OUTPUT: {output}\n")
-
     return output
 
 
@@ -214,3 +278,30 @@ def get_start_date(as_of_date: dt.date):
 def get_master_summary_file_path():
     root_dir = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(root_dir, "master_summary.txt")
+
+
+def num_tokens_from_string(text: str, model_name: str) -> int | None:
+    """Returns the number of tokens in a text string."""
+    num_tokens = None
+    try:
+        # TODO: add implementation of getting the size more flexibly
+        encoding = tiktoken.encoding_for_model("gpt-4o-mini")
+        # encoding = tiktoken.get_encoding(model_name)
+        num_tokens = len(encoding.encode(text))
+    except Exception as e:
+        logger.error(e, exc_info=True)
+    return num_tokens
+
+
+def get_chunk_size(text: str, model_name: str) -> int:
+    """
+    Returns the chunk_size based number of tokens in a text string.
+    Experiment:
+        Start with chunks sized at 25–50% of the model's token limit.
+        Include an overlap of 10–20% for smooth transitions.
+    """
+    n_tokens = num_tokens_from_string(text, model_name)
+    # if code failed to get number of tokens use default chunk_size = 3000
+    # use 50% of the model's token limit as chunk_size
+    chunk_size = n_tokens // 2 if n_tokens else 3000
+    return chunk_size

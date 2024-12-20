@@ -21,7 +21,9 @@ if __name__ == "__main__":
     as_of_date = as_of_date.date()
 
     with create_session() as session:
-        download_articles.pull_articles(session, as_of_date, test=True if args.test else False)
+        download_articles.pull_articles(
+            session, as_of_date, test=True if args.test else False
+        )
         create_content_summary.run(session, as_of_date)
         master_summary = create_master_summary.run(session, as_of_date)
         logger.info(

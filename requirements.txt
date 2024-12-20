@@ -13,3 +13,4 @@ transformers
 streamlit
 psycopg2
 langchain_community
+tiktoken

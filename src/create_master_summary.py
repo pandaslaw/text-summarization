@@ -7,11 +7,10 @@ import argparse
 import datetime as dt
 
 from loguru import logger
-from sqlalchemy import and_
 
 from src.config import app_settings
-from src.database import create_session, CryptonewsArticlesDump, get_articles_by_summary
-from src.utils import generate_summary, get_start_date, generate_summary_huggingface
+from src.database import create_session, get_articles_by_summary
+from src.utils import get_start_date, summarize_text
 
 
 def run(session, as_of_date: dt.date) -> str:
@@ -31,7 +30,7 @@ def run(session, as_of_date: dt.date) -> str:
     if all_content_summaries:
         master_summary = articles[0].master_summary
         if not master_summary:
-            master_summary = generate_summary_huggingface(all_content_summaries, prompt)
+            master_summary = summarize_text(all_content_summaries, prompt)
             for article in articles:
                 article.master_summary = master_summary
     else:

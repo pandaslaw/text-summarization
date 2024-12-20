@@ -55,7 +55,7 @@ def get_articles_by_summary(session, start_date: dt.date, empty_summary: bool = 
     """Load CryptonewsArticlesDump objects from database."""
 
     # TODO: carefully select records based on date (take care of timezone)
-    contrent_summary_condition = (
+    content_summary_condition = (
         CryptonewsArticlesDump.content_summary != None
         if not empty_summary
         else CryptonewsArticlesDump.content_summary == None
@@ -63,7 +63,7 @@ def get_articles_by_summary(session, start_date: dt.date, empty_summary: bool = 
     return (
         session.query(CryptonewsArticlesDump)
         .filter(
-            and_(CryptonewsArticlesDump.date >= start_date, contrent_summary_condition)
+            and_(CryptonewsArticlesDump.date >= start_date, content_summary_condition)
         )
         .all()
     )

@@ -9,8 +9,7 @@ from loguru import logger
 from src.config import app_settings
 from src.utils import (
     get_master_summary_file_path,
-    generate_summary,
-    generate_summary_huggingface,
+    summarize_text,
 )
 
 
@@ -38,7 +37,7 @@ def run(as_of_date: dt.date, data_source_file_name: str = None) -> str:
         master_summary = ""
         if all_content_summaries:
             logger.info(f"Starting summary generation process for all articles..")
-            master_summary = generate_summary_huggingface(all_content_summaries, prompt)
+            master_summary = summarize_text(all_content_summaries, prompt)
             logger.info("Completed.")
     else:
         header = f"Master Summary as of {as_of_date.isoformat()}"
