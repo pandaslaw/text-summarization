@@ -11,7 +11,12 @@ from bs4 import BeautifulSoup
 from loguru import logger
 
 from src.config import app_settings
-from src.database import create_session, CryptonewsArticlesDump, save_articles_to_db, get_articles
+from src.database import (
+    create_session,
+    CryptonewsArticlesDump,
+    save_articles_to_db,
+    get_articles,
+)
 from src.utils import get_start_date
 
 
@@ -42,7 +47,7 @@ def create_cryptonews_article_db_entity(
     """Create database entry."""
 
     date_str = metadata.get("date")
-    datetime_obj = dt.datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %z')
+    datetime_obj = dt.datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z")
 
     # TODO: assign tags
     article = CryptonewsArticlesDump(

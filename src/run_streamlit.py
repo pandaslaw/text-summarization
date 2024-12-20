@@ -7,7 +7,11 @@ import streamlit as st
 from loguru import logger
 
 from src.config import app_settings
-from src.utils import get_master_summary_file_path, generate_summary, generate_summary_huggingface
+from src.utils import (
+    get_master_summary_file_path,
+    generate_summary,
+    generate_summary_huggingface,
+)
 
 
 def run(as_of_date: dt.date, data_source_file_name: str = None) -> str:
