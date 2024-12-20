@@ -146,7 +146,9 @@ def summarize_text(
     start_time = dt.datetime.now()
 
     full_prompt = f"{system_prompt}\n\n{article_text}"
-    if len(full_prompt) > 128000:
+    n_tokens = num_tokens_from_string(full_prompt, model)
+
+    if n_tokens > 128000:
         # Step 1: Split the article into manageable chunks
         chunk_size = get_chunk_size(article_text, app_settings.LANGUAGE_MODEL)
         text_splitter = CharacterTextSplitter(
