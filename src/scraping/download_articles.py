@@ -15,9 +15,8 @@ from src.database import (
     create_session,
     CryptonewsArticlesDump,
     save_articles_to_db,
-    get_articles,
 )
-from src.utils import get_start_date
+from src.summarization.utils.utils import get_start_date
 
 
 def get_article_content(news_url: str) -> str:

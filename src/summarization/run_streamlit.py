@@ -7,7 +7,7 @@ import streamlit as st
 from loguru import logger
 
 from src.config import app_settings
-from src.utils import (
+from src.summarization.utils.utils import (
     get_master_summary_file_path,
     summarize_text,
 )

@@ -10,7 +10,7 @@ from loguru import logger
 
 from src.config import app_settings
 from src.database import create_session, get_articles_by_summary
-from src.utils import get_start_date, summarize_text
+from src.summarization.utils.utils import get_start_date, summarize_text
 
 
 def run(session, as_of_date: dt.date) -> str:

@@ -3,9 +3,10 @@ import datetime as dt
 
 from loguru import logger
 
-from src import create_content_summary, create_master_summary, download_articles
+from src.summarization import create_content_summary, create_master_summary
+from src.scraping import download_articles
 from src.database import create_session
-from src.utils import get_master_summary_file_path
+from src.summarization.utils.utils import get_master_summary_file_path
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
