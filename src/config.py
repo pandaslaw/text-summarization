@@ -1,5 +1,7 @@
+import os
 from typing import List
 
+import yaml
 from dotenv import load_dotenv
 from loguru import logger
 from pydantic.v1 import BaseSettings
@@ -27,13 +29,27 @@ class AppSettings(BaseSettings):
     TELEGRAM_BOT_TOKEN: str
     GROUP_CHAT_ID: int
 
-    PROMPT_FOR_CONTENT_SUMMARY: str
-    PROMPT_FOR_MASTER_SUMMARY: str
+    # Prompts loaded from YAML
+    CONTENT_SUMMARY_PROMPT: str = None
+    MASTER_SUMMARY_PROMPT: str = None
+
+    def load_prompts_from_yaml(self, yaml_file="prompts.yaml"):
+        """Load prompts from the specified YAML file."""
+        root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+        docs_dir = "data"
+        yaml_file_full_path = os.path.join(root_dir, docs_dir, yaml_file)
+
+        with open(yaml_file_full_path, "r", encoding="utf-8") as file:
+            prompts = yaml.safe_load(file)
+
+        self.CONTENT_SUMMARY_PROMPT = prompts.get("content_summary_prompt", "")
+        self.MASTER_SUMMARY_PROMPT = prompts.get("master_summary_prompt", "")
 
 
 logger.info("Loading environment variables from .env file.")
 load_dotenv()
 app_settings = AppSettings()
+app_settings.load_prompts_from_yaml()
 app_settings.HUGGINGFACE_HEADERS = {
     "Authorization": f"Bearer {app_settings.HUGGINGFACE_API_KEY}"
 }
@@ -44,9 +60,9 @@ logger.info(f"CONFIG (LANGUAGE_MODEL): {app_settings.LANGUAGE_MODEL}")
 logger.info(f"CONFIG (GROUP_CHAT_ID): {app_settings.GROUP_CHAT_ID}")
 logger.info(f"CONFIG (ADMIN_USER_IDS): {app_settings.ADMIN_USER_IDS}")
 logger.info(
-    f"CONFIG (PROMPT_FOR_CONTENT_SUMMARY): {app_settings.PROMPT_FOR_CONTENT_SUMMARY}"
+    f"CONFIG (CONTENT_SUMMARY_PROMPT): {app_settings.CONTENT_SUMMARY_PROMPT}"
 )
 logger.info(
-    f"CONFIG (PROMPT_FOR_MASTER_SUMMARY): {app_settings.PROMPT_FOR_MASTER_SUMMARY}"
+    f"CONFIG (MASTER_SUMMARY_PROMPT): {app_settings.MASTER_SUMMARY_PROMPT}"
 )
 logger.info("-------------ENV VARIABLES INITIALIZATION FINISHED-------------\n\n")

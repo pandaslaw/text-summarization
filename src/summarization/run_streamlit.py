@@ -23,7 +23,7 @@ def run(as_of_date: dt.date, data_source_file_name: str = None) -> str:
         with open(full_path) as f:
             articles = json.load(f)
 
-        prompt = app_settings.PROMPT_FOR_MASTER_SUMMARY
+        prompt = app_settings.MASTER_SUMMARY_PROMPT
 
         all_content_summaries_list = [
             article["body"] for article in articles if article.get("body")

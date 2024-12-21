@@ -31,9 +31,9 @@ if __name__ == "__main__":
 
     parser.add_argument("--as_of_date")
 
-    parser.add_argument("--stage_1", action=argparse.BooleanOptionalAction)
-    parser.add_argument("--stage_2", action=argparse.BooleanOptionalAction)
-    parser.add_argument("--stage_3", action=argparse.BooleanOptionalAction)
+    parser.add_argument("--run_stage_1", action=argparse.BooleanOptionalAction)
+    parser.add_argument("--run_stage_2", action=argparse.BooleanOptionalAction)
+    parser.add_argument("--run_stage_3", action=argparse.BooleanOptionalAction)
 
     parser.add_argument("--test", action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
@@ -45,15 +45,11 @@ if __name__ == "__main__":
     )
     as_of_date = as_of_date.date()
 
-    stage_1 = args.stage_1
-    stage_2 = args.stage_2
-    stage_3 = args.stage_3
-
-    if stage_1:
+    if args.run_stage_1:
         stage_1(as_of_date)
-    if stage_2:
+    if args.run_stage_2:
         stage_2(as_of_date)
-    if stage_3:
+    if args.run_stage_3:
         asyncio.run(stage_3())
 
     # scheduler = BackgroundScheduler()

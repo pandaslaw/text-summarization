@@ -14,7 +14,7 @@ from src.summarization.utils.utils import get_start_date, summarize_text
 
 
 def run(session, as_of_date: dt.date, ticker: str):
-    prompt = app_settings.PROMPT_FOR_CONTENT_SUMMARY
+    prompt = app_settings.CONTENT_SUMMARY_PROMPT
     start_date = get_start_date(as_of_date)
     logger.info(
         "Starting summary generation process for each article with no content summary.."
