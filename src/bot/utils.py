@@ -1,0 +1,22 @@
+def escape_markdown_v2(text):
+    """Escape special characters for MarkdownV2."""
+    return (
+        text.replace("_", "\\_")
+        .replace("*", "\\*")
+        .replace("[", "\\[")
+        .replace("]", "\\]")
+        .replace("(", "\\(")
+        .replace(")", "\\)")
+        .replace("~", "\\~")
+        .replace("`", "\\`")
+        .replace(">", "\\>")
+        .replace("#", "\\#")
+        .replace("+", "\\+")
+        .replace("-", "\\-")
+        .replace("=", "\\=")
+        .replace("|", "\\|")
+        .replace("{", "\\{")
+        .replace("}", "\\}")
+        .replace(".", "\\.")
+        .replace("!", "\\!")
+    )

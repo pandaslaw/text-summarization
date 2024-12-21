@@ -4,7 +4,6 @@ This file contains functions to get/download/organize/save data from cryptonews 
 
 import argparse
 import datetime as dt
-from typing import List
 
 import requests
 from bs4 import BeautifulSoup
@@ -41,7 +40,9 @@ def get_article_content(news_url: str) -> str:
 
 
 def create_cryptonews_article_db_entity(
-    metadata: dict, article_content: str
+    metadata: dict,
+    article_content: str,
+    ticker: str,
 ) -> CryptonewsArticlesDump:
     """Create database entry."""
 
@@ -60,11 +61,12 @@ def create_cryptonews_article_db_entity(
         sentiment=metadata.get("sentiment"),
         content_type=metadata.get("type"),
         body=article_content,
+        tags=ticker,
     )
     return article
 
 
-def pull_articles(session, as_of_date: dt.date, tags: List[str] = None, test=False):
+def pull_articles(session, as_of_date: dt.date, ticker: str = None, test=False):
     """
     Collects all news articles according to tag as of previous business day through API and saves data to db.
 
@@ -74,35 +76,41 @@ def pull_articles(session, as_of_date: dt.date, tags: List[str] = None, test=Fal
     if test:
         pull_articles_stub(session, as_of_date)
     else:
-        pull_articles_from_api(session, as_of_date, tags)
+        pull_articles_from_api(session, as_of_date, ticker)
 
 
-def pull_articles_from_api(session, as_of_date: dt.date, tags: List[str] = None):
+def pull_articles_from_api(session, as_of_date: dt.date, ticker: str = None):
     """
     Collects all news articles according to tag as of previous business day through API and saves data to db.
 
     Tags feature is not available yet.
     """
-
+    # Sundown Digest is an engaging evening article that encapsulates the crucial news and events of the day, presented in a digestible format. Available Mon-Fri at 7pm Eastern Time.
+    # https://cryptonews-api.com/api/v1/sundown-digest?page=1&token=GET_API_KEY
     start_date = get_start_date(as_of_date)
     start_date_str = start_date.strftime("%m%d%Y")
 
     pages = 1
-    section = "general"
-    items = 3
+    items = 3  # 50
     token = app_settings.CRYPTONEWS_API_KEY
 
-    url_base = f"https://cryptonews-api.com"
     # TODO: review timeframe set up in url
     # Available formats:
     #   01152019-today, 01152019-01152019, today, yesterday, last7days, last30days, yeartodate
-    url_with_params = f"{url_base}/api/v1/category?section={section}&items={items}&date={start_date_str}-today&token={token}"
+    url_base = f"https://cryptonews-api.com"
+    if ticker:
+        url_with_params = f"{url_base}/api/v1?tickers={ticker}&items={items}&date={start_date_str}-today&token={token}"
+    else:
+        url_with_params = f"{url_base}/api/v1/category?section=general&items={items}&date={start_date_str}-today&token={token}"
+
     url_with_params_page1 = f"{url_with_params}&page=1"
 
     logger.info(
         f"Starting to pull data for {start_date.isoformat()} - {as_of_date.isoformat()} period from {url_base}..."
     )
     response = requests.get(f"{url_with_params}&page=1")
+    if response and response.status_code != 200:
+        raise Exception(response.content)
     response_json = response.json()
     articles_metadata_list = response_json.get("data", [])
 
@@ -113,7 +121,7 @@ def pull_articles_from_api(session, as_of_date: dt.date, tags: List[str] = None)
         return
 
     db_entities = []
-    pages = response_json.get("total_pages", pages)
+    # pages = response_json.get("total_pages", pages)
     for i in range(1, pages + 1):
         url_full = f"{url_with_params}&page={i}"
         response = requests.get(url_full)
@@ -122,11 +130,13 @@ def pull_articles_from_api(session, as_of_date: dt.date, tags: List[str] = None)
 
         for article_metadata in articles_metadata_list:
             news_url = article_metadata.get("news_url")
-            # TODO: temporal filter by website, remove after adding universal scraper
-            if news_url and "coindesk.com" in news_url:
-                article_content = get_article_content(news_url)
+            if news_url:
+                # TODO: do not scrape/save article's content, we have a article link saved and
+                #  we can scrape it later if needed
+                # article_content = get_article_content(news_url)
+                article_content = ""
                 db_entity = create_cryptonews_article_db_entity(
-                    article_metadata, article_content
+                    article_metadata, article_content, ticker
                 )
                 db_entities.append(db_entity)
     save_articles_to_db(session, db_entities)

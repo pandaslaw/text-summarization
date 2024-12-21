@@ -9,11 +9,11 @@ import datetime as dt
 from loguru import logger
 
 from src.config import app_settings
-from src.database import create_session, get_articles_by_summary
+from src.database import create_session, get_articles_by_ticker
 from src.summarization.utils.utils import get_start_date, summarize_text
 
 
-def run(session, as_of_date: dt.date) -> str:
+def run(session, as_of_date: dt.date, ticker: str) -> str:
     master_summary = ""
     prompt = app_settings.PROMPT_FOR_MASTER_SUMMARY
     start_date = get_start_date(as_of_date)
@@ -22,7 +22,13 @@ def run(session, as_of_date: dt.date) -> str:
     )
 
     # TODO: carefully select records based on date (take care of timezone)
-    articles = get_articles_by_summary(session, start_date, empty_summary=False)
+    articles = get_articles_by_ticker(
+        session,
+        start_date,
+        ticker,
+        empty_content_summary=False,
+        empty_master_summary=True,
+    )
 
     all_content_summaries_list = [article.content_summary for article in articles]
     all_content_summaries = "\n\n".join(all_content_summaries_list)
@@ -44,6 +50,7 @@ def run(session, as_of_date: dt.date) -> str:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--as_of_date")
+    parser.add_argument("--ticker")
     args = parser.parse_args()
 
     as_of_date = (
@@ -52,6 +59,7 @@ if __name__ == "__main__":
         else dt.datetime.today()
     )
     as_of_date = as_of_date.date()
+    ticker = args.ticker
 
     with create_session() as session:
-        run(session, as_of_date)
+        run(session, as_of_date, ticker)

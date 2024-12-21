@@ -2,7 +2,7 @@ import datetime as dt
 from typing import List
 
 from loguru import logger
-from sqlalchemy import Integer, Date, and_
+from sqlalchemy import Integer, Date, and_, or_
 from sqlalchemy import String
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
@@ -51,22 +51,65 @@ def get_articles(session, start_date: dt.date = None) -> List[CryptonewsArticles
     return session.query(CryptonewsArticlesDump).all()
 
 
-def get_articles_by_summary(session, start_date: dt.date, empty_summary: bool = True):
+def get_articles_by_ticker(
+    session,
+    start_date: dt.date,
+    ticker: str,
+    empty_content_summary: bool = None,
+    empty_master_summary: bool = None,
+):
     """Load CryptonewsArticlesDump objects from database."""
 
     # TODO: carefully select records based on date (take care of timezone)
-    content_summary_condition = (
-        CryptonewsArticlesDump.content_summary != None
-        if not empty_summary
-        else CryptonewsArticlesDump.content_summary == None
-    )
-    return (
-        session.query(CryptonewsArticlesDump)
+    all_conditions = [
+        CryptonewsArticlesDump.date >= start_date,
+        CryptonewsArticlesDump.tags == ticker,
+    ]
+
+    if empty_content_summary is not None:
+        if empty_content_summary:
+            content_summary_condition = or_(
+                CryptonewsArticlesDump.content_summary.is_(None),
+                CryptonewsArticlesDump.content_summary == "",
+            )
+        else:
+            content_summary_condition = and_(
+                CryptonewsArticlesDump.content_summary.isnot(None),
+                CryptonewsArticlesDump.content_summary != "",
+            )
+        all_conditions.append(content_summary_condition)
+
+    if empty_master_summary is not None:
+        if empty_master_summary:
+            master_summary_condition = or_(
+                CryptonewsArticlesDump.master_summary.is_(None),
+                CryptonewsArticlesDump.master_summary == "",
+            )
+        else:
+            master_summary_condition = and_(
+                CryptonewsArticlesDump.master_summary.isnot(None),
+                CryptonewsArticlesDump.master_summary != "",
+            )
+        all_conditions.append(master_summary_condition)
+
+    result = session.query(CryptonewsArticlesDump).filter(and_(*all_conditions)).all()
+    return result
+
+
+def get_master_summary(session, start_date: dt.date, ticker: str) -> str | None:
+    """Load CryptonewsArticlesDump objects from database."""
+
+    master_summary = (
+        session.query(CryptonewsArticlesDump.master_summary)
         .filter(
-            and_(CryptonewsArticlesDump.date >= start_date, content_summary_condition)
+            and_(
+                CryptonewsArticlesDump.date == start_date,
+                CryptonewsArticlesDump.tags == ticker,
+            )
         )
-        .all()
+        .first()
     )
+    return master_summary[0] if master_summary else None
 
 
 def save_articles_to_db(session, cryptonews_articles: List[CryptonewsArticlesDump]):

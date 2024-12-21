@@ -1,16 +1,40 @@
 import argparse
+import asyncio
 import datetime as dt
 
-from loguru import logger
+from telegram import Bot
 
-from src.summarization import create_content_summary, create_master_summary
-from src.scraping import download_articles
-from src.database import create_session
-from src.summarization.utils.utils import get_master_summary_file_path
+from src.bot.handlers.summary_handler import send_master_summaries
+from src.config import app_settings
+from src.summarization.save_daily_summary import (
+    pull_articles_and_save_articles,
+    create_and_save_summaries,
+)
+
+bot = Bot(token=app_settings.TELEGRAM_BOT_TOKEN)
+
+
+def stage_1(as_of_date: dt.date):
+    pull_articles_and_save_articles(as_of_date)
+
+
+def stage_2(as_of_date: dt.date):
+    create_and_save_summaries(as_of_date)
+
+
+async def stage_3():
+    await send_master_summaries()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+
     parser.add_argument("--as_of_date")
+
+    parser.add_argument("--stage_1", action=argparse.BooleanOptionalAction)
+    parser.add_argument("--stage_2", action=argparse.BooleanOptionalAction)
+    parser.add_argument("--stage_3", action=argparse.BooleanOptionalAction)
+
     parser.add_argument("--test", action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
 
@@ -21,16 +45,24 @@ if __name__ == "__main__":
     )
     as_of_date = as_of_date.date()
 
-    with create_session() as session:
-        download_articles.pull_articles(
-            session, as_of_date, test=True if args.test else False
-        )
-        create_content_summary.run(session, as_of_date)
-        master_summary = create_master_summary.run(session, as_of_date)
-        logger.info(
-            f"\nHere is generated Sundown Digest as of {as_of_date.isoformat()}:\n\n{master_summary}"
-        )
+    stage_1 = args.stage_1
+    stage_2 = args.stage_2
+    stage_3 = args.stage_3
 
-    with open(get_master_summary_file_path(), "w") as file:
-        file.write(master_summary)
-    logger.info("Save master summary to txt to file.")
+    if stage_1:
+        stage_1(as_of_date)
+    if stage_2:
+        stage_2(as_of_date)
+    if stage_3:
+        asyncio.run(stage_3())
+
+    # scheduler = BackgroundScheduler()
+    # scheduler.add_job(generate_daily_summaries, "cron", hour=18)
+    # scheduler.start()
+
+    # Schedule tasks
+    # schedule.every().day.at("03:00").do(fetch_and_summarize_articles)  # 3 AM UTC
+    # schedule.every().day.at("06:00").do(send_master_summaries)  # 6 AM UTC
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(1)
