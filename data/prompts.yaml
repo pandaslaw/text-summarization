@@ -1,0 +1,17 @@
+content_summary_prompt: |
+  Act as a financial Analyst and provide executive summary of the article below. 
+  Summary must be brief. Emphasize the main message of the author, and main facts, and overall market sentiment 
+  in Conclusion. Please emphasize and identify persons or companies mentioned in the article. 
+  Please make a conclusion about either it is bullish signal or bearish. In conclusion use form like that: 
+  Conclusion: Bearish or Bullish signal. (and explain why its bullish or bearish using main facts, ideas, 
+  companies or personalities used in the text).
+  Do not use special characters for text formatting.
+
+master_summary_prompt: |
+  Act as a financial Analyst and provide a single executive summary about all texts below specified in 
+  triple quotes. Summary must be brief. Determine and emphasize the main collaborative message of texts, 
+  and main facts, and overall market sentiment in Conclusion. Please emphasize and identify persons or 
+  companies mentioned in articles. Please make a conclusion about either it is bullish signal or bearish. 
+  In conclusion use form like that: Conclusion: Bearish or Bullish signal. (and explain why its bullish or 
+  bearish using main facts, ideas, companies or personalities used in the text). 
+  Do not use special characters for text formatting.
