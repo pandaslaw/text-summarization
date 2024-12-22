@@ -93,3 +93,47 @@ def save_articles_to_db(session, cryptonews_articles: List[CryptonewsArticlesDum
         if not is_already_in_db:
             session.add(article)
     session.commit()
+
+
+from sqlalchemy.orm import joinedload
+
+articles = session.query(CryptonewsArticle).options(joinedload(CryptonewsArticle.master_summary)).all()
+for article in articles:
+    print(f"Article: {article.title}, Summary: {article.master_summary.summary_text if article.master_summary else 'No summary'}")
+
+def get_or_create_master_summary(session, ticker, as_of_date):
+    summary = session.query(MasterSummary).filter_by(ticker=ticker, as_of_date=as_of_date).first()
+    if not summary:
+        summary = MasterSummary(ticker=ticker, as_of_date=as_of_date)
+        session.add(summary)
+    return summary
+
+
+# Example: Adding topics and tickers
+article = CryptonewsArticle(news_url="example.com", title="Sample Title", published_at=datetime.utcnow())
+
+# Add topics
+topic1 = session.query(Topic).filter_by(name="pricemovement").first() or Topic(name="pricemovement")
+topic2 = session.query(Topic).filter_by(name="markettrend").first() or Topic(name="markettrend")
+article.topics.extend([topic1, topic2])
+
+# Add tickers
+ticker1 = session.query(Ticker).filter_by(symbol="BTC").first() or Ticker(symbol="BTC")
+ticker2 = session.query(Ticker).filter_by(symbol="USDC").first() or Ticker(symbol="USDC")
+article.tickers.extend([ticker1, ticker2])
+
+session.add(article)
+session.commit()
+
+# Fetch all articles related to a specific topic
+topic = session.query(Topic).filter_by(name="pricemovement").first()
+if topic:
+    for article in topic.articles:
+        print(article.title)
+
+# Fetch all articles related to a specific ticker
+ticker = session.query(Ticker).filter_by(symbol="BTC").first()
+if ticker:
+    for article in ticker.articles:
+        print(article.title)
+
