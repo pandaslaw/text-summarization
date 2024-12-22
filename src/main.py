@@ -29,14 +29,14 @@ async def main():
     bot_app.add_error_handler(error_handler)
 
     try:
-        print("Starting the bot...")
+        logger.info("Starting the bot...")
         await bot_app.start()
         await bot_app.updater.start_polling()
         await asyncio.Future()
     except (KeyboardInterrupt, SystemExit):
-        print("Bot stopped.")
+        logger.error("Bot stopped.")
     finally:
-        print("Shutting down the bot...")
+        logger.info("Shutting down the bot...")
 
 
 if __name__ == "__main__":

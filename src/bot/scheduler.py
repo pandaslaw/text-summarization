@@ -1,3 +1,5 @@
+import sys
+import traceback
 from logging import getLogger
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -44,7 +46,7 @@ async def generate_master_summaries(bot_app):
         pull_articles_and_save_articles(as_of_date)
 
         logger.info(
-            f"Stage 3. Creating content summaries for every article for {as_of_date}. "
+            f"Stage 2. Creating content summaries for every article for {as_of_date}. "
             f"Creating master summary for {as_of_date} per ticker..."
         )
         create_and_save_summaries(as_of_date)
@@ -56,7 +58,16 @@ async def generate_master_summaries(bot_app):
 
         logger.info("Successfully sent daily master summaries!\n\n")
     except Exception as e:
-        logger.error(f"Error generating summaries: {e}")
-        await notify_admin_on_error(
-            bot_app.bot, f"Failed to generate daily summaries: {e}"
-        )
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        tb_summary = traceback.extract_tb(exc_tb)
+
+        error_message = f"Error occurred during daily scheduled process: {e}"
+        messages = [error_message]
+        logger.error(error_message)
+
+        for tb in tb_summary:
+            message = f"File: {tb.filename}, Line: {tb.lineno}, Function: {tb.name}, Code: {tb.line}"
+            messages.append(message)
+            logger.error(message)
+
+        await notify_admin_on_error(bot_app.bot, "\n\n".join(messages))

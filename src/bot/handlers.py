@@ -1,3 +1,4 @@
+import asyncio
 import datetime as dt
 from logging import getLogger
 
@@ -84,20 +85,25 @@ async def send_master_summaries(as_of_date, bot_app):
     """Generate and send master summaries for each topic."""
 
     with create_session() as session:
-        for ticker in TICKERS:
-            try:
+        try:
+            for ticker in TICKERS:
+                logger.info(f"Loading master summary for '{ticker}' ticker...")
                 master_summary = get_master_summary(session, as_of_date, ticker)
 
                 escaped_summary = escape_markdown_v2(master_summary)
 
-                await bot.send_message(
+                message = await bot.send_message(
                     chat_id=app_settings.GROUP_CHAT_ID,
                     text=escaped_summary,
                     parse_mode=ParseMode.MARKDOWN_V2,
                     message_thread_id=TOPICS[ticker],
                 )
-                logger.info(f"Sent master summary to '{ticker}' topic.")
-            except Exception as e:
-                error_message = f"Error sending master summary to '{ticker}' topic: {e}"
-                logger.error(error_message)
-                await notify_admin_on_error(bot_app.bot, error_message)
+                logger.info(f"Sent master summary to '{ticker}' topic, message ID: {message.message_id}.")
+                await asyncio.sleep(1)
+
+            logger.info(f"Successfully finished with sending master summaries to {len(TICKERS)} topics.")
+        except Exception as e:
+            error_message = f"Error sending master summary to '{ticker}' topic: {e}"
+            logger.error(error_message)
+            await notify_admin_on_error(bot_app.bot, error_message)
+
