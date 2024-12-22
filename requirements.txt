@@ -1,4 +1,3 @@
-loguru
 openai
 pydantic
 pytest
@@ -8,8 +7,6 @@ httpx
 black
 SQLAlchemy
 beautifulsoup4
-pandas
-transformers
 streamlit
 psycopg2
 langchain_community
