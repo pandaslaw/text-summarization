@@ -13,5 +13,13 @@ def test_get_start_date():
     assert start_date_exp == start_date_actual
 
 
+@pytest.mark.asyncio
+async def test_generate_summary_for_topic(bot_app):
+    topic = "BTC"
+    result = await generate_summary_for_topic(bot_app, topic)
+    assert result is not None
+    assert "summary" in result
+
+
 if __name__ == "__main__":
     pytest.main([__file__])

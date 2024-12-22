@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import CallbackContext, ContextTypes, CommandHandler, Application
 
-from src.bot.utils import escape_markdown_v2
+from src.bot.utils import escape_markdown_v2, notify_admin_on_error
 from src.config.config import app_settings
 from src.config.constants import TICKERS, TOPICS
 from src.database.connection import create_session
@@ -80,7 +80,7 @@ async def get_topics(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
 
-async def send_master_summaries(as_of_date):
+async def send_master_summaries(as_of_date, bot_app):
     """Generate and send master summaries for each topic."""
 
     with create_session() as session:
@@ -98,4 +98,6 @@ async def send_master_summaries(as_of_date):
                 )
                 logger.info(f"Sent master summary to '{ticker}' topic.")
             except Exception as e:
-                print(f"Error sending master summary to '{ticker}' topic: {e}")
+                error_message = f"Error sending master summary to '{ticker}' topic: {e}"
+                logger.error(error_message)
+                await notify_admin_on_error(bot_app.bot, error_message)

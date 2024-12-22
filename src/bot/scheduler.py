@@ -3,8 +3,8 @@ from logging import getLogger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from src.bot.admin_handlers import notify_admin_on_error
 from src.bot.handlers import send_master_summaries
+from src.bot.utils import notify_admin_on_error
 from src.services.datetime_util import DatetimeUtil
 from src.services.summarizer import (
     pull_articles_and_save_articles,
@@ -14,7 +14,7 @@ from src.services.summarizer import (
 logger = getLogger(__name__)
 
 
-def setup_scheduler(app):
+def setup_scheduler(bot_app):
     """Set up the scheduler and register tasks."""
     scheduler = AsyncIOScheduler()
 
@@ -24,7 +24,7 @@ def setup_scheduler(app):
         CronTrigger(
             hour=3, minute=0, timezone="UTC"
         ),  # Adjust time as needed, e.g. 'interval', minutes=5,
-        kwargs={"bot_app": app},
+        kwargs={"bot_app": bot_app},
         id="daily_summary",
         replace_existing=True,
     )
@@ -52,9 +52,9 @@ async def generate_master_summaries(bot_app):
         logger.info(
             f"Stage 3. Starting to send master summaries to each telegram group's topic..."
         )
-        await send_master_summaries(as_of_date)
+        await send_master_summaries(as_of_date, bot_app)
 
-        logger.info("Successfully sent daily master summaries!")
+        logger.info("Successfully sent daily master summaries!\n\n")
     except Exception as e:
         logger.error(f"Error generating summaries: {e}")
         await notify_admin_on_error(

@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 # Define log directory
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 LOG_DIR = os.path.join(ROOT_DIR, "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
