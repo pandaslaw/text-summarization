@@ -71,7 +71,7 @@ def setup_discord_daily_summarize_scheduler(bot_app):
 
     scheduler.start()
     logger.info(
-        "Summarize scheduler initialized and daily task scheduled at 9:00 AM UTC."
+        "Summarize scheduler initialized and daily task scheduled at 8:00 AM local time."
     )
 
 
@@ -90,7 +90,7 @@ def setup_twitter_daily_summarize_scheduler(bot_app):
 
     scheduler.start()
     logger.info(
-        "Summarize scheduler initialized and daily task scheduled at 8:00 AM UTC."
+        "Summarize scheduler initialized and daily task scheduled at 9:00 AM local time."
     )
 
 
@@ -120,7 +120,7 @@ async def pull_todays_articles(bot_app):
 
 async def generate_master_summaries(bot_app):
     """Task to generate master summaries."""
-    as_of_date = DatetimeUtil.utc_now().date()
+    as_of_date = DatetimeUtil.utc_yesterday().date()
 
     logger.info(f"Generating daily master summaries for {as_of_date}...")
     try:
