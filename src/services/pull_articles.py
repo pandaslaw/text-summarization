@@ -86,8 +86,11 @@ def pull_articles_from_api(session, as_of_date: dt.date, ticker: str = None):
     max_pages_to_process = 5  # Basic plans can query up to 5 pages
     items = 100  # max allowed items in response is 100 json objects
 
+    skip_the_rest_of_articles = False
     db_entities = []
     for page in range(1, max_pages_to_process + 1):
+        if skip_the_rest_of_articles:
+            break
         articles_metadata_list = get_cryptonews_response(
             ticker, items, page, as_of_date
         )
@@ -113,7 +116,8 @@ def pull_articles_from_api(session, as_of_date: dt.date, ticker: str = None):
                 if db_entity.date.date() < as_of_date:
                     logger.warning(f"Current article's date = {db_entity.date} is earlier than the specified "
                                    f"as_of_date = {as_of_date}. So skipping further processing for ticker '{ticker}'.\n")
-                    return
+                    skip_the_rest_of_articles = True
+                    break
 
                 existing_article = (
                     session.query(CryptonewsArticlesDump)
