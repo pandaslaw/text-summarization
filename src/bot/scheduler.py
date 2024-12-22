@@ -24,9 +24,8 @@ def setup_article_pull_scheduler(bot_app):
 
     scheduler.add_job(
         pull_todays_articles,
-        CronTrigger(
-            hour=20, minute=00, timezone="UTC"
-        ),  # Adjust time as needed, e.g. 'interval', minutes=5,
+        # Adjust time as needed, e.g. 'interval', minutes=5,
+        CronTrigger(hour=23, minute=30),
         kwargs={"bot_app": bot_app},
         id="daily_article_pull",
         replace_existing=True,
@@ -34,7 +33,7 @@ def setup_article_pull_scheduler(bot_app):
 
     scheduler.start()
     logger.info(
-        "Article pull scheduler initialized and daily task scheduled at 8:00 PM UTC."
+        "Article pull scheduler initialized and daily task scheduled at 11:30 PM local time."
     )
 
 
@@ -44,9 +43,8 @@ def setup_summarize_scheduler(bot_app):
 
     scheduler.add_job(
         generate_master_summaries,
-        CronTrigger(
-            hour=3, minute=0, timezone="UTC"
-        ),  # Adjust time as needed, e.g. 'interval', minutes=5,
+        # Adjust time as needed, e.g. 'interval', minutes=5,
+        CronTrigger(hour=5, minute=0),
         kwargs={"bot_app": bot_app},
         id="daily_summary",
         replace_existing=True,
@@ -54,7 +52,7 @@ def setup_summarize_scheduler(bot_app):
 
     scheduler.start()
     logger.info(
-        "Summarize scheduler initialized and daily task scheduled at 3:00 AM UTC."
+        "Summarize scheduler initialized and daily task scheduled at 5:00 AM local time."
     )
 
 
@@ -64,9 +62,8 @@ def setup_discord_daily_summarize_scheduler(bot_app):
 
     scheduler.add_job(
         run_scheduled_task,
-        CronTrigger(
-            hour=9, minute=0
-        ),  # Adjust time as needed, e.g. 'interval', minutes=5,
+        # Adjust time as needed, e.g. 'interval', minutes=5,
+        CronTrigger(hour=8, minute=0),
         kwargs={"bot_app": bot_app},
         id="daily_discord_summary",
         replace_existing=True,
@@ -84,9 +81,8 @@ def setup_twitter_daily_summarize_scheduler(bot_app):
 
     scheduler.add_job(
         run_twitter_summarizer,
-        CronTrigger(
-            hour=8, minute=0
-        ),  # Adjust time as needed, e.g. 'interval', minutes=5,
+        # Adjust time as needed, e.g. 'interval', minutes=5,
+        CronTrigger(hour=9, minute=0),
         kwargs={"bot_app": bot_app},
         id="daily_twitter_summary",
         replace_existing=True,
@@ -124,7 +120,7 @@ async def pull_todays_articles(bot_app):
 
 async def generate_master_summaries(bot_app):
     """Task to generate master summaries."""
-    as_of_date = DatetimeUtil.utc_yesterday().date()
+    as_of_date = DatetimeUtil.utc_now().date()
 
     logger.info(f"Generating daily master summaries for {as_of_date}...")
     try:
