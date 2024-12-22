@@ -3,7 +3,7 @@ from logging import getLogger
 
 from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import CallbackContext, ContextTypes
+from telegram.ext import CallbackContext, ContextTypes, CommandHandler, Application
 
 from src.bot.utils import escape_markdown_v2
 from src.config.config import app_settings
@@ -14,14 +14,26 @@ from src.run_bot import bot
 
 logger = getLogger(__name__)
 
+# Record bot's start time
+APP_START_TIME = dt.datetime.now()
+
+
+def register_handlers(app: Application):
+    """Register all command and message handlers."""
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("create_topic", create_topic))
+    app.add_handler(CommandHandler("get_topics", get_topics))
+
 
 async def start(update: Update, context: CallbackContext):
+    """Handle the /start command."""
     await update.message.reply_text(
         "Welcome to the News Summary Bot! Use /subscribe to subscribe to a channel."
     )
 
 
 async def create_topic(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle the /create_topic command."""
     # Check if user provided a topic name
     if context.args:
         topic_name = " ".join(context.args)

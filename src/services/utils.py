@@ -1,6 +1,7 @@
 import datetime as dt
 import os
 import time
+import zipfile
 from logging import getLogger
 from typing import Dict, List
 
@@ -18,6 +19,7 @@ from pandas.tseries.offsets import BDay
 from transformers import pipeline, AutoTokenizer
 
 from src.config.config import app_settings
+from src.config.logging_config import LOG_DIR
 
 logger = getLogger(__name__)
 
@@ -307,3 +309,28 @@ def get_chunk_size(text: str, model_name: str) -> int:
     # use 50% of the model's token limit as chunk_size
     chunk_size = n_tokens // 2 if n_tokens else 3000
     return chunk_size
+
+
+def get_today_logs() -> List[str]:
+    """Collects all file paths of log files for today."""
+    today = dt.datetime.now().date()
+    today_logs = []
+
+    for filename in os.listdir(LOG_DIR):
+        if filename.endswith(".log"):
+            file_date = dt.datetime.fromtimestamp(
+                os.path.getmtime(os.path.join(LOG_DIR, filename))
+            ).date()
+            if file_date == today:
+                today_logs.append(os.path.join(LOG_DIR, filename))
+
+    return today_logs
+
+
+def create_zip_archive(log_files: List[str]) -> str:
+    """Creates zip archive with the specified log files."""
+    zip_filename = "logs.zip"
+    with zipfile.ZipFile(zip_filename, "w") as zipf:
+        for log_file in log_files:
+            zipf.write(log_file, os.path.basename(log_file))
+    return zip_filename
