@@ -14,6 +14,7 @@ TOPICS = {
     "ADA": 76,
     "TRX": 79,
     "TON": 82,
+    # "Story": 192,
 }
 
 TICKERS = {

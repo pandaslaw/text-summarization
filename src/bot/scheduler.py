@@ -23,7 +23,7 @@ def setup_article_pull_scheduler(bot_app):
     scheduler.add_job(
         pull_todays_articles,
         CronTrigger(
-            hour=23, minute=00, timezone="UTC"
+            hour=20, minute=00, timezone="UTC"
         ),  # Adjust time as needed, e.g. 'interval', minutes=5,
         kwargs={"bot_app": bot_app},
         id="daily_article_pull",
@@ -31,7 +31,7 @@ def setup_article_pull_scheduler(bot_app):
     )
 
     scheduler.start()
-    logger.info("Scheduler initialized and daily task scheduled at 11:00 PM UTC.")
+    logger.info("Article pull scheduler initialized and daily task scheduled at 8:00 PM UTC.")
 
 
 def setup_summarize_scheduler(bot_app):
@@ -49,7 +49,7 @@ def setup_summarize_scheduler(bot_app):
     )
 
     scheduler.start()
-    logger.info("Scheduler initialized and daily task scheduled at 3:00 AM UTC.")
+    logger.info("Summarize scheduler initialized and daily task scheduled at 3:00 AM UTC.")
 
 
 async def pull_todays_articles(bot_app):

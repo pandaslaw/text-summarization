@@ -6,7 +6,7 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import CallbackContext, ContextTypes, CommandHandler, Application
 
-from src.bot.utils import escape_markdown_v2, notify_admin_on_error
+from src.bot.utils import escape_markdown_v2, notify_admin_on_error, get_response_json
 from src.config.config import app_settings
 from src.config.constants import TICKERS, TOPICS
 from src.database.connection import create_session
@@ -24,6 +24,8 @@ def register_handlers(app: Application):
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("create_topic", create_topic))
     app.add_handler(CommandHandler("get_topics", get_topics))
+    app.add_handler(CommandHandler("validator_health", send_validator_status))
+
 
 
 async def start(update: Update, context: CallbackContext):
@@ -106,4 +108,30 @@ async def send_master_summaries(as_of_date, bot_app):
             error_message = f"Error sending master summary to '{ticker}' topic: {e}"
             logger.error(error_message)
             await notify_admin_on_error(bot_app.bot, error_message)
+
+
+
+async def send_validator_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle the /validator_health command."""
+    if context.args:
+        validator_user_name = " ".join(context.args)
+        url = f"https://api.testnet.storyscan.app/validators?name={validator_user_name}"
+
+        response_json = get_response_json(url)
+        items  = response_json["items"][0]
+        status = items["status"]
+        commission_str = items["commission"]["commission_rates"]["rate"]
+        commission = float(commission_str) * 100
+
+        uptime = items["uptime"]["windowUptime"]["uptime"] * 100
+
+        health_message = (
+            f"✅ Validator status for {validator_user_name}: {status}\n"
+            f"⏱ Uptime: {uptime}%\n"
+            f"⏱ Commission: {commission}\n"
+        )
+
+        await update.message.reply_text(health_message)
+    else:
+        await update.message.reply_text("Please provide a link to summarize.")
 

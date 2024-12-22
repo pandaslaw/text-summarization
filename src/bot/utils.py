@@ -1,11 +1,25 @@
 from logging import getLogger
 
+import requests
 from telegram.error import TelegramError
 from telegram.ext import CallbackContext
 
 from src.config.config import app_settings
 
 logger = getLogger(__name__)
+
+
+def get_response_json(url: str):
+    response = requests.get(url)
+
+    if response is not None and response.status_code != 200:
+        logger.error(
+            f"Error on requesting 'url': {response.content}"
+        )
+        raise Exception(response.content)
+
+    response_json = response.json()
+    return response_json
 
 
 def escape_markdown_v2(text):
