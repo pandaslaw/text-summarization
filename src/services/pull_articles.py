@@ -83,8 +83,8 @@ def pull_articles_from_api(session, as_of_date: dt.date, ticker: str = None):
 
     Tags feature is not available yet.
     """
-    max_pages_to_process = 1  # Basic plans can query up to 5 pages
-    items = 3  # max allowed items in response is 100 json objects
+    max_pages_to_process = 5  # Basic plans can query up to 5 pages
+    items = 100  # max allowed items in response is 100 json objects
 
     db_entities = []
     for page in range(1, max_pages_to_process + 1):
@@ -142,10 +142,11 @@ def get_cryptonews_response(ticker, items, page, as_of_date):
         url_with_params = f"{url_base}/api/v1/category?section=general"
 
     # TODO: currently we consider that we pull articles on daily basis so we hardcode 'date' param as 'yesterday'
-    url_with_params = url_with_params + f"&items={items}&date=yesterday&page={page}"
+    # TODO: specifying &date=yesterday is not supported in Basic subscription, so pull today's articles on daily basis
+    url_with_params = url_with_params + f"&items={items}&page={page}"
 
     logger.info(f"Starting to pull data from page #{page} '{items}' items for '{ticker}' ticker "
-                f"for 'yesterday' period from {url_base}...")
+                f"for 'today' period from {url_base}...")
 
     full_url = f"{url_with_params}&token={token}"
     response = requests.get(full_url)
@@ -221,3 +222,6 @@ def pull_articles_stub(session, as_of_date):
         db_entities.append(db_entity)
     save_articles_to_db(session, db_entities)
     logger.info("Completed.\n")
+
+
+a = get_cryptonews_response("BTC", 100, 5, dt.date(2024, 12,21))

@@ -5,7 +5,7 @@ from telegram.ext import ApplicationBuilder
 
 from src.bot.admin_handlers import register_admin_handlers
 from src.bot.handlers import register_handlers
-from src.bot.scheduler import setup_scheduler, generate_master_summaries
+from src.bot.scheduler import setup_summarize_scheduler, generate_master_summaries, setup_article_pull_scheduler
 from src.bot.utils import error_handler
 from src.config.config import app_settings
 from src.config.logging_config import setup_logging
@@ -24,7 +24,8 @@ async def main():
     register_handlers(bot_app)
     register_admin_handlers(bot_app)
 
-    setup_scheduler(bot_app)
+    setup_article_pull_scheduler(bot_app)
+    setup_summarize_scheduler(bot_app)
 
     bot_app.add_error_handler(error_handler)
 
