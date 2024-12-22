@@ -15,7 +15,7 @@ def get_articles(session, start_date: dt.date = None) -> List[CryptonewsArticles
     if start_date:
         return (
             session.query(CryptonewsArticlesDump)
-            .filter(CryptonewsArticlesDump.date >= start_date)
+            .filter(CryptonewsArticlesDump.date == start_date)
             .all()
         )
     return session.query(CryptonewsArticlesDump).all()
@@ -32,7 +32,7 @@ def get_articles_by_ticker(
 
     # TODO: carefully select records based on date (take care of timezone)
     all_conditions = [
-        CryptonewsArticlesDump.date >= start_date,
+        CryptonewsArticlesDump.date == start_date,
         CryptonewsArticlesDump.tags == ticker,
     ]
 

@@ -80,9 +80,8 @@ async def get_topics(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
 
-async def send_master_summaries():
+async def send_master_summaries(as_of_date):
     """Generate and send master summaries for each topic."""
-    as_of_date = dt.datetime.utcnow().date()
 
     with create_session() as session:
         for ticker in TICKERS:

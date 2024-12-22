@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from src.config.config import app_settings
 from src.database.database import save_articles_to_db
 from src.database.models import CryptonewsArticlesDump
-from src.services.utils import get_start_date
+from src.services.datetime_util import DatetimeUtil
 
 logger = getLogger(__name__)
 
@@ -45,7 +45,7 @@ def create_cryptonews_article_db_entity(
     """Create database entry."""
 
     date_str = metadata.get("date")
-    datetime_obj = dt.datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z")
+    datetime_obj = DatetimeUtil.parse_and_convert_to_utc(date_str)
 
     # TODO: assign tags
     article = CryptonewsArticlesDump(
@@ -83,48 +83,21 @@ def pull_articles_from_api(session, as_of_date: dt.date, ticker: str = None):
 
     Tags feature is not available yet.
     """
-    # Sundown Digest is an engaging evening article that encapsulates the crucial news and events of the day, presented in a digestible format. Available Mon-Fri at 7pm Eastern Time.
-    # https://cryptonews-api.com/api/v1/sundown-digest?page=1&token=GET_API_KEY
-    start_date = get_start_date(as_of_date)
-    start_date_str = start_date.strftime("%m%d%Y")
-
-    pages = 1
-    items = 3  # 50
-    token = app_settings.CRYPTONEWS_API_KEY
-
-    # TODO: review timeframe set up in url
-    # Available formats:
-    #   01152019-today, 01152019-01152019, today, yesterday, last7days, last30days, yeartodate
-    url_base = f"https://cryptonews-api.com"
-    if ticker:
-        url_with_params = f"{url_base}/api/v1?tickers={ticker}&items={items}&date={start_date_str}-today&token={token}"
-    else:
-        url_with_params = f"{url_base}/api/v1/category?section=general&items={items}&date={start_date_str}-today&token={token}"
-
-    url_with_params_page1 = f"{url_with_params}&page=1"
-
-    logger.info(
-        f"Starting to pull data for {start_date.isoformat()} - {as_of_date.isoformat()} period from {url_base}..."
-    )
-    response = requests.get(f"{url_with_params}&page=1")
-    if response and response.status_code != 200:
-        raise Exception(response.content)
-    response_json = response.json()
-    articles_metadata_list = response_json.get("data", [])
-
-    if not articles_metadata_list:
-        logger.error(
-            f"No data to pull from {url_with_params_page1}. Please check query parameters and date."
-        )
-        return
+    max_pages_to_process = 5  # Basic plans can query up to 5 pages
+    items = 100  # max allowed items in response is 100 json objects
 
     db_entities = []
-    # pages = response_json.get("total_pages", pages)
-    for i in range(1, pages + 1):
-        url_full = f"{url_with_params}&page={i}"
-        response = requests.get(url_full)
-        response_json = response.json()
-        articles_metadata_list = response_json.get("data", [])
+    for page in range(1, max_pages_to_process + 1):
+        articles_metadata_list = get_cryptonews_response(
+            ticker, items, page, as_of_date
+        )
+
+        if not articles_metadata_list:
+            logger.warning(
+                f"No data to pull from https://cryptonews-api.com/ with params (ticker, items, page, as_of_date): "
+                f"({(ticker, items, page, as_of_date)}). Skipping."
+            )
+            continue
 
         for article_metadata in articles_metadata_list:
             news_url = article_metadata.get("news_url")
@@ -133,10 +106,17 @@ def pull_articles_from_api(session, as_of_date: dt.date, ticker: str = None):
                 #  we can scrape it later if needed
                 # article_content = get_article_content(news_url)
                 article_content = ""
-                db_entity = create_cryptonews_article_db_entity(
-                    article_metadata, article_content, ticker
+                existing_article = (
+                    session.query(CryptonewsArticlesDump)
+                    .filter_by(news_url=news_url)
+                    .first()
                 )
-                db_entities.append(db_entity)
+                if not existing_article:
+                    db_entity = create_cryptonews_article_db_entity(
+                        article_metadata, article_content, ticker
+                    )
+                    db_entities.append(db_entity)
+
     save_articles_to_db(session, db_entities)
     logger.info(
         f"Articles pull and save completed successfully. "
@@ -144,7 +124,50 @@ def pull_articles_from_api(session, as_of_date: dt.date, ticker: str = None):
     )
 
 
-def pull_articles_stub(session, as_of_date):
+def get_cryptonews_response(ticker, items, page, as_of_date):
+    # Sundown Digest is an engaging evening article that encapsulates the crucial news and events of the day, presented in a digestible format. Available Mon-Fri at 7pm Eastern Time.
+    # https://cryptonews-api.com/api/v1/sundown-digest?page=1&token=GET_API_KEY
+    # start_date = get_start_date(as_of_date)
+    # start_date_str = start_date.strftime("%m%d%Y")
+
+    token = app_settings.CRYPTONEWS_API_KEY
+
+    # TODO: review timeframe set up in url
+    # Available formats:
+    #   01152019-today, 01152019-01152019, today, yesterday, last7days, last30days, yeartodate
+    url_base = f"https://cryptonews-api.com"
+    if ticker:
+        url_with_params = f"{url_base}/api/v1?tickers={ticker}"
+    else:
+        url_with_params = f"{url_base}/api/v1/category?section=general"
+
+    # TODO: currently we consider that we pull articles on daily basis so we hardcode 'date' param as 'yesterday'
+    url_with_params = url_with_params + f"&items={items}&date=yesterday&page={page}"
+
+    logger.info(f"Starting to pull data for 'yesterday' period from {url_base}...")
+
+    full_url = f"{url_with_params}&token={token}"
+    response = requests.get(full_url)
+
+    if response is not None and response.status_code != 200:
+        logger.error(
+            f"Error on requesting '{url_with_params}&token=<my_token>': {response.content}"
+        )
+        raise Exception(response.content)
+
+    response_json = response.json()
+    articles_metadata_list = response_json.get("data", [])
+
+    return articles_metadata_list
+
+
+def get_cryptonews_response_stub_with_error(ticker, items, page, as_of_date):
+    if ticker == "Test Error":
+        raise Exception("Intentional test error.")
+    return get_cryptonews_response_stub(ticker, items, page, as_of_date)
+
+
+def get_cryptonews_response_stub(ticker, items, page, as_of_date):
     as_of_date_str = as_of_date.isoformat()
 
     articles_metadata_list = [
@@ -182,6 +205,11 @@ def pull_articles_stub(session, as_of_date):
             "type": "Article",
         },
     ]
+    return articles_metadata_list
+
+
+def pull_articles_stub(session, as_of_date):
+    articles_metadata_list = get_cryptonews_response_stub(as_of_date)
     db_entities = []
     for article_metadata in articles_metadata_list:
         news_url = article_metadata.get("news_url")
