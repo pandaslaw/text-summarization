@@ -1,7 +1,16 @@
+import datetime as dt
 from logging import getLogger
 
 from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import CallbackContext, ContextTypes
+
+from src.bot.utils import escape_markdown_v2
+from src.config.config import app_settings
+from src.config.constants import TICKERS, TOPICS
+from src.database.connection import create_session
+from src.database.database import get_master_summary
+from src.run_bot import bot
 
 logger = getLogger(__name__)
 
@@ -57,3 +66,25 @@ async def get_topics(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_thread_id=thread_id,
         )
         return
+
+
+async def send_master_summaries():
+    """Generate and send master summaries for each topic."""
+    as_of_date = dt.datetime.utcnow().date()
+
+    with create_session() as session:
+        for ticker in TICKERS:
+            try:
+                master_summary = get_master_summary(session, as_of_date, ticker)
+
+                escaped_summary = escape_markdown_v2(master_summary)
+
+                await bot.send_message(
+                    chat_id=app_settings.GROUP_CHAT_ID,
+                    text=escaped_summary,
+                    parse_mode=ParseMode.MARKDOWN_V2,
+                    message_thread_id=TOPICS[ticker],
+                )
+                logger.info(f"Sent master summary to '{ticker}' topic.")
+            except Exception as e:
+                print(f"Error sending master summary to '{ticker}' topic: {e}")

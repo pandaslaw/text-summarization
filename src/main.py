@@ -1,17 +1,14 @@
 import argparse
 import asyncio
 import datetime as dt
-import time
 from logging import getLogger
 
-import schedule
-from apscheduler.schedulers.background import BackgroundScheduler
 from telegram import Bot
 
 from src.bot.handlers.summary_handler import send_master_summaries
-from src.config import app_settings
-from src.logging_config import setup_logging
-from src.summarization.save_daily_summary import (
+from src.config.config import app_settings
+from src.config.logging_config import setup_logging
+from src.services.summarizer import (
     pull_articles_and_save_articles,
     create_and_save_summaries,
 )

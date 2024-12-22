@@ -2,7 +2,7 @@ import datetime as dt
 
 import pytest
 
-from src.summarization.utils.utils import get_start_date
+from src.services.utils import get_start_date
 
 
 def test_get_start_date():

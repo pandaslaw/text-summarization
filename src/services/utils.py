@@ -17,7 +17,7 @@ from openai import OpenAI
 from pandas.tseries.offsets import BDay
 from transformers import pipeline, AutoTokenizer
 
-from src.config import app_settings
+from src.config.config import app_settings
 
 logger = getLogger(__name__)
 

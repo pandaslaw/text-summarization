@@ -1,6 +1,6 @@
 import streamlit as st
 
-from src.database import create_session, CryptonewsArticlesDump
+from src.database.connection import create_session
 
 
 def run(session):

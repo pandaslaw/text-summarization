@@ -6,8 +6,8 @@ from logging import getLogger
 
 import streamlit as st
 
-from src.config import app_settings
-from src.summarization.utils.utils import (
+from src.config.config import app_settings
+from src.services.utils import (
     get_master_summary_file_path,
     summarize_text,
 )

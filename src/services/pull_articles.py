@@ -2,20 +2,16 @@
 This file contains functions to get/download/organize/save data from cryptonews websites.
 """
 
-import argparse
 import datetime as dt
 from logging import getLogger
 
 import requests
 from bs4 import BeautifulSoup
 
-from src.config import app_settings
-from src.database import (
-    create_session,
-    CryptonewsArticlesDump,
-    save_articles_to_db,
-)
-from src.summarization.utils.utils import get_start_date
+from src.config.config import app_settings
+from src.database.database import save_articles_to_db
+from src.database.models import CryptonewsArticlesDump
+from src.services.utils import get_start_date
 
 logger = getLogger(__name__)
 
@@ -196,19 +192,3 @@ def pull_articles_stub(session, as_of_date):
         db_entities.append(db_entity)
     save_articles_to_db(session, db_entities)
     logger.info("Completed.\n")
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--as_of_date")
-    args = parser.parse_args()
-
-    as_of_date = (
-        dt.datetime.strptime(args.as_of_date, "%Y-%m-%d")
-        if args.as_of_date
-        else dt.datetime.today()
-    )
-    as_of_date = as_of_date.date()
-
-    with create_session() as session:
-        pull_articles(session, as_of_date, test=False)
