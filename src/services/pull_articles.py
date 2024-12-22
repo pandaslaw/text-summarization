@@ -106,15 +106,21 @@ def pull_articles_from_api(session, as_of_date: dt.date, ticker: str = None):
                 #  we can scrape it later if needed
                 # article_content = get_article_content(news_url)
                 article_content = ""
+
+                db_entity = create_cryptonews_article_db_entity(
+                    article_metadata, article_content, ticker
+                )
+                if db_entity.date.date() < as_of_date:
+                    logger.warning(f"Current article's date = {db_entity.date} is earlier than the specified "
+                                   f"as_of_date = {as_of_date}. So skipping further processing for ticker '{ticker}'.\n")
+                    return
+
                 existing_article = (
                     session.query(CryptonewsArticlesDump)
                     .filter_by(news_url=news_url)
                     .first()
                 )
                 if not existing_article:
-                    db_entity = create_cryptonews_article_db_entity(
-                        article_metadata, article_content, ticker
-                    )
                     db_entities.append(db_entity)
 
     save_articles_to_db(session, db_entities)
@@ -224,4 +230,4 @@ def pull_articles_stub(session, as_of_date):
     logger.info("Completed.\n")
 
 
-a = get_cryptonews_response("BTC", 100, 5, dt.date(2024, 12,21))
+# a = get_cryptonews_response("BTC", 100, 5, dt.date(2024, 12,21))

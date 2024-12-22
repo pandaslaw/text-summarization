@@ -26,7 +26,7 @@ def setup_article_pull_scheduler(bot_app):
             hour=23, minute=00, timezone="UTC"
         ),  # Adjust time as needed, e.g. 'interval', minutes=5,
         kwargs={"bot_app": bot_app},
-        id="daily_summary",
+        id="daily_article_pull",
         replace_existing=True,
     )
 
@@ -56,7 +56,6 @@ async def pull_todays_articles(bot_app):
     """Task to pull and save articles."""
     as_of_date = DatetimeUtil.utc_now().date()
 
-    logger.info(f"Generating daily master summaries for {as_of_date}...")
     try:
         logger.info(f"Stage 1. Pulling articles and saving to db...")
         pull_articles_and_save_articles(as_of_date)
