@@ -33,7 +33,9 @@ def setup_article_pull_scheduler(bot_app):
     )
 
     scheduler.start()
-    logger.info("Article pull scheduler initialized and daily task scheduled at 8:00 PM UTC.")
+    logger.info(
+        "Article pull scheduler initialized and daily task scheduled at 8:00 PM UTC."
+    )
 
 
 def setup_summarize_scheduler(bot_app):
@@ -51,8 +53,9 @@ def setup_summarize_scheduler(bot_app):
     )
 
     scheduler.start()
-    logger.info("Summarize scheduler initialized and daily task scheduled at 3:00 AM UTC.")
-
+    logger.info(
+        "Summarize scheduler initialized and daily task scheduled at 3:00 AM UTC."
+    )
 
 
 def setup_discord_daily_summarize_scheduler(bot_app):
@@ -70,7 +73,10 @@ def setup_discord_daily_summarize_scheduler(bot_app):
     )
 
     scheduler.start()
-    logger.info("Summarize scheduler initialized and daily task scheduled at 9:00 AM UTC.")
+    logger.info(
+        "Summarize scheduler initialized and daily task scheduled at 9:00 AM UTC."
+    )
+
 
 def setup_twitter_daily_summarize_scheduler(bot_app):
     """Set up the scheduler and register tasks."""
@@ -87,7 +93,9 @@ def setup_twitter_daily_summarize_scheduler(bot_app):
     )
 
     scheduler.start()
-    logger.info("Summarize scheduler initialized and daily task scheduled at 8:00 AM UTC.")
+    logger.info(
+        "Summarize scheduler initialized and daily task scheduled at 8:00 AM UTC."
+    )
 
 
 async def pull_todays_articles(bot_app):

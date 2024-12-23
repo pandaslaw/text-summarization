@@ -34,6 +34,12 @@ class AppSettings(BaseSettings):
     DISCORD_BOT_TOKEN: str
     DISCORD_CHANNEL_ID: int
 
+    TWITTER_BEARER_TOKEN: str
+    TWITTER_API_KEY: str
+    TWITTER_API_SECRET_KEY: str
+    TWITTER_ACCESS_TOKEN: str
+    TWITTER_ACCESS_TOKEN_SECRET: str
+
     # Prompts loaded from YAML
     CONTENT_SUMMARY_PROMPT: str = None
     MASTER_SUMMARY_PROMPT: str = None

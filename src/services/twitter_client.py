@@ -1,31 +1,22 @@
-import tweepy
-import os
 import asyncio
 from datetime import datetime, timedelta
 from logging import getLogger
-import openai
 
+import tweepy
+
+from src.config.config import app_settings
 from src.services.utils import summarize_text
 
 # Set up logging
 logger = getLogger(__name__)
 
-# Set up your OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-# Set up Twitter API credentials
-TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
-TWITTER_API_SECRET_KEY = os.getenv("TWITTER_API_SECRET_KEY")
-TWITTER_ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
-TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
-
 # Initialize Tweepy client
 client = tweepy.Client(
-    bearer_token=TWITTER_API_KEY,
-    consumer_key=TWITTER_API_KEY,
-    consumer_secret=TWITTER_API_SECRET_KEY,
-    access_token=TWITTER_ACCESS_TOKEN,
-    access_token_secret=TWITTER_ACCESS_TOKEN_SECRET,
+    bearer_token=app_settings.TWITTER_BEARER_TOKEN,
+    consumer_key=app_settings.TWITTER_API_KEY,
+    consumer_secret=app_settings.TWITTER_API_SECRET_KEY,
+    access_token=app_settings.TWITTER_ACCESS_TOKEN,
+    access_token_secret=app_settings.TWITTER_ACCESS_TOKEN_SECRET,
 )
 
 
