@@ -70,3 +70,8 @@ async def notify_admin_on_error(bot_app, error_message):
             )
     except Exception as e:
         logger.error(f"Failed to notify admin: {e}")
+
+
+def split_message(message: str, max_length: int = 4096) -> list:
+    """Split the message into chunks of max_length."""
+    return [message[i:i + max_length] for i in range(0, len(message), max_length)]

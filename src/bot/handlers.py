@@ -1,12 +1,14 @@
 import asyncio
 import datetime as dt
+import sys
+import traceback
 from logging import getLogger
 
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import CallbackContext, ContextTypes, CommandHandler, Application
 
-from src.bot.utils import escape_markdown_v2, notify_admin_on_error, get_response_json
+from src.bot.utils import escape_markdown_v2, notify_admin_on_error, get_response_json, split_message
 from src.config.config import app_settings
 from src.config.constants import TICKERS, TOPICS
 from src.database.connection import create_session
@@ -24,7 +26,8 @@ def register_handlers(app: Application):
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("create_topic", create_topic))
     app.add_handler(CommandHandler("get_topics", get_topics))
-    app.add_handler(CommandHandler("validator_health", send_validator_status))
+    app.add_handler(CommandHandler("validator_status", send_validator_status))
+    # app.add_handler(CommandHandler("best_validator", get_best_validator))
 
 
 
@@ -113,28 +116,113 @@ async def send_master_summaries(as_of_date, bot_app):
             logger.error(error_message)
             await notify_admin_on_error(bot_app.bot, error_message)
 
+def get_validator_info(items, active_only: bool):
+    status_mapping = {1: "Jail", 2: "Inactive", 3: "Active"}
 
+    # user data
+    name = items["description"]["moniker"]
+    operator_address = items["operator_address"]
+
+    # metadata
+    status_int = items["status"]
+    status = status_mapping.get(status_int)
+    uptime = round(items["uptime"]["windowUptime"]["uptime"] * 100, 2)
+    commission_str = items["commission"]["commission_rates"]["rate"]
+    commission = round(float(commission_str) * 100, 2)
+
+    link_to_page = rf"https://testnet.storyscan.app/validators/{operator_address}?tab=profile"
+
+    status_message = (
+        f"<a href='{link_to_page}'>{name}</a>\n\n"
+        f"✅ Status: {status}\n"
+        f"⏱ Uptime: {uptime}%\n"
+        f"💸 Commission: {commission}%\n"
+    )
+    if active_only and status_int != 3:
+        return ""
+    return status_message
 
 async def send_validator_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle the /validator_health command."""
+    """Handle the /validator_status command."""
     if context.args:
         validator_user_name = " ".join(context.args)
         url = f"https://api.testnet.storyscan.app/validators?name={validator_user_name}"
 
         response_json = get_response_json(url)
-        items  = response_json["items"][0]
-        status = items["status"]
-        commission_str = items["commission"]["commission_rates"]["rate"]
-        commission = float(commission_str) * 100
+        items = response_json["items"][0]
+        validator_info= get_validator_info(items, False)
 
-        uptime = items["uptime"]["windowUptime"]["uptime"] * 100
-
-        health_message = (
-            f"✅ Validator status for {validator_user_name}: {status}\n"
-            f"⏱ Uptime: {uptime}%\n"
-            f"⏱ Commission: {commission}\n"
-        )
-
-        await update.message.reply_text(health_message)
+        await update.message.reply_text(validator_info, parse_mode='HTML')
     else:
-        await update.message.reply_text("Please provide correct name.")
+        url = "https://api.testnet.storyscan.app/validators"
+
+        try:
+            all_items = []
+            curr_page = 1
+
+            await update.message.reply_text("Requesting info for all active validators...")
+
+            while True:
+                response_json = get_response_json(f"{url}?page={curr_page}")
+                items = response_json.get("items", [])
+                all_items.extend(items)
+
+                pagination = response_json.get('pagination', {})
+                total_pages = pagination.get('pages', 0)
+                if curr_page >= total_pages:
+                    break
+
+                curr_page += 1
+
+            # Collect status messages
+            status_messages = []
+            for item in all_items:
+                status_message = get_validator_info(item, True)
+                if status_message:
+                    status_messages.append(status_message)
+
+            # Join the messages with a newline
+            status_messages_str = "\n\n".join(status_messages)
+
+            # Split the message into chunks
+            message_chunks = split_message(status_messages_str)
+
+            # Send each chunk
+            for chunk in message_chunks:
+                await update.message.reply_text(chunk, parse_mode='HTML')
+        except Exception as e:
+            exc_type, exc_value, exc_tb = sys.exc_info()
+            tb_summary = traceback.extract_tb(exc_tb)
+
+            error_message = f"Error pulling info about validators: {e}"
+            messages = [error_message]
+            logger.error(error_message)
+
+            for tb in tb_summary:
+                message = f"File: {tb.filename}, Line: {tb.lineno}, Function: {tb.name}, Code: {tb.line}"
+                messages.append(message)
+                logger.error(message)
+
+            await update.message.reply_text(error_message)
+
+
+
+async def get_best_validator(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle the /best_validator command."""
+    url = f"https://api.testnet.storyscan.app/validators"
+
+    response_json = get_response_json(url)
+    items  = response_json["items"][0]
+    status = items["status"]
+    commission_str = items["commission"]["commission_rates"]["rate"]
+    commission = float(commission_str) * 100
+
+    uptime = items["uptime"]["windowUptime"]["uptime"] * 100
+
+    health_message = (
+        f"⏱ Uptime: {uptime}%\n"
+        f"⏱ Commission: {commission}\n"
+    )
+
+    await update.message.reply_text(health_message)
+
