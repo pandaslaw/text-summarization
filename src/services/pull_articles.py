@@ -72,7 +72,7 @@ def pull_articles(session, as_of_date: dt.date, ticker: str = None, test=False):
     """
 
     if test:
-        pull_articles_stub(session, as_of_date)
+        pull_articles_stub(session, as_of_date, ticker)
     else:
         pull_articles_from_api(session, as_of_date, ticker)
 
@@ -156,7 +156,8 @@ def get_cryptonews_response(ticker, items, page, as_of_date):
     url_with_params = url_with_params + f"&items={items}&page={page}"
 
     logger.info(f"Starting to pull data from page #{page} '{items}' items for '{ticker}' ticker "
-                f"for 'today' period from {url_base}...")
+                f"for 'today' period from {url_base}.")
+    logger.info(f"URL: {url_with_params}&token=")
 
     full_url = f"{url_with_params}&token={token}"
     response = requests.get(full_url)
@@ -220,14 +221,15 @@ def get_cryptonews_response_stub(ticker, items, page, as_of_date):
     return articles_metadata_list
 
 
-def pull_articles_stub(session, as_of_date):
-    articles_metadata_list = get_cryptonews_response_stub(as_of_date)
+def pull_articles_stub(session, as_of_date, ticker):
+    items, page = 1, 1
+    articles_metadata_list = get_cryptonews_response_stub(ticker, items, page, as_of_date)
     db_entities = []
     for article_metadata in articles_metadata_list:
         news_url = article_metadata.get("news_url")
         article_content = get_article_content(news_url)
         db_entity = create_cryptonews_article_db_entity(
-            article_metadata, article_content
+            article_metadata, article_content, ticker
         )
         db_entities.append(db_entity)
     save_articles_to_db(session, db_entities)

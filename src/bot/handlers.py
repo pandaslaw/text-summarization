@@ -92,6 +92,10 @@ async def send_master_summaries(as_of_date, bot_app):
                 logger.info(f"Loading master summary for '{ticker}' ticker...")
                 master_summary = get_master_summary(session, as_of_date, ticker)
 
+                if not master_summary:
+                    logger.warning(f"Master summary is missing for '{ticker}' ticker for on {as_of_date}. SKIPPING.")
+                    continue
+
                 escaped_summary = escape_markdown_v2(master_summary)
 
                 message = await bot.send_message(
@@ -133,5 +137,4 @@ async def send_validator_status(update: Update, context: ContextTypes.DEFAULT_TY
 
         await update.message.reply_text(health_message)
     else:
-        await update.message.reply_text("Please provide a link to summarize.")
-
+        await update.message.reply_text("Please provide correct name.")
