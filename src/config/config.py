@@ -31,6 +31,9 @@ class AppSettings(BaseSettings):
     TELEGRAM_BOT_TOKEN: str
     GROUP_CHAT_ID: int
 
+    DISCORD_BOT_TOKEN: str
+    DISCORD_CHANNEL_ID: int
+
     # Prompts loaded from YAML
     CONTENT_SUMMARY_PROMPT: str = None
     MASTER_SUMMARY_PROMPT: str = None

@@ -8,6 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 from src.bot.handlers import send_master_summaries
 from src.bot.utils import notify_admin_on_error
 from src.services.datetime_util import DatetimeUtil
+from src.services.discord_client import run_scheduled_task
 from src.services.summarizer import (
     pull_articles_and_save_articles,
     create_and_save_summaries,
@@ -50,6 +51,26 @@ def setup_summarize_scheduler(bot_app):
 
     scheduler.start()
     logger.info("Summarize scheduler initialized and daily task scheduled at 3:00 AM UTC.")
+
+
+
+def setup_discord_daily_summarize_scheduler(bot_app):
+    """Set up the scheduler and register tasks."""
+    scheduler = AsyncIOScheduler()
+
+    scheduler.add_job(
+        run_scheduled_task,
+        CronTrigger(
+            hour=11, minute=0
+        ),  # Adjust time as needed, e.g. 'interval', minutes=5,
+        kwargs={"bot_app": bot_app},
+        id="daily_summary",
+        replace_existing=True,
+    )
+
+    scheduler.start()
+    logger.info("Summarize scheduler initialized and daily task scheduled at 3:00 AM UTC.")
+
 
 
 async def pull_todays_articles(bot_app):
