@@ -74,4 +74,22 @@ async def notify_admin_on_error(bot_app, error_message):
 
 def split_message(message: str, max_length: int = 4096) -> list:
     """Split the message into chunks of max_length."""
-    return [message[i:i + max_length] for i in range(0, len(message), max_length)]
+    chunks = []
+    current_chunk = ""
+
+    for line in message.split("\n"):
+        # Check the length if we add this line
+        if len(current_chunk) + len(line) + 1 > max_length:  # +1 for the newline
+            if current_chunk:  # If current chunk is not empty, add it to chunks
+                chunks.append(current_chunk)
+            current_chunk = line  # Start a new chunk with the current line
+        else:
+            if current_chunk:  # If current chunk is not empty, add a newline first
+                current_chunk += "\n"
+            current_chunk += line
+
+    # Add any remaining chunk
+    if current_chunk:
+        chunks.append(current_chunk)
+
+    return chunks
