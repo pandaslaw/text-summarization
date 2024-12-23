@@ -114,8 +114,10 @@ def pull_articles_from_api(session, as_of_date: dt.date, ticker: str = None):
                     article_metadata, article_content, ticker
                 )
                 if db_entity.date.date() < as_of_date:
-                    logger.warning(f"Current article's date = {db_entity.date} is earlier than the specified "
-                                   f"as_of_date = {as_of_date}. So skipping further processing for ticker '{ticker}'.\n")
+                    logger.warning(
+                        f"Current article's date = {db_entity.date} is earlier than the specified "
+                        f"as_of_date = {as_of_date}. So skipping further processing for ticker '{ticker}'.\n"
+                    )
                     skip_the_rest_of_articles = True
                     break
 
@@ -155,8 +157,10 @@ def get_cryptonews_response(ticker, items, page, as_of_date):
     # TODO: specifying &date=yesterday is not supported in Basic subscription, so pull today's articles on daily basis
     url_with_params = url_with_params + f"&items={items}&page={page}"
 
-    logger.info(f"Starting to pull data from page #{page} '{items}' items for '{ticker}' ticker "
-                f"for 'today' period from {url_base}.")
+    logger.info(
+        f"Starting to pull data from page #{page} '{items}' items for '{ticker}' ticker "
+        f"for 'today' period from {url_base}."
+    )
     logger.info(f"URL: {url_with_params}&token=")
 
     full_url = f"{url_with_params}&token={token}"
@@ -223,7 +227,9 @@ def get_cryptonews_response_stub(ticker, items, page, as_of_date):
 
 def pull_articles_stub(session, as_of_date, ticker):
     items, page = 1, 1
-    articles_metadata_list = get_cryptonews_response_stub(ticker, items, page, as_of_date)
+    articles_metadata_list = get_cryptonews_response_stub(
+        ticker, items, page, as_of_date
+    )
     db_entities = []
     for article_metadata in articles_metadata_list:
         news_url = article_metadata.get("news_url")

@@ -8,7 +8,12 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import CallbackContext, ContextTypes, CommandHandler, Application
 
-from src.bot.utils import escape_markdown_v2, notify_admin_on_error, get_response_json, split_message
+from src.bot.utils import (
+    escape_markdown_v2,
+    notify_admin_on_error,
+    get_response_json,
+    split_message,
+)
 from src.config.config import app_settings
 from src.config.constants import TICKERS, TOPICS
 from src.database.connection import create_session
@@ -95,7 +100,9 @@ async def send_master_summaries(as_of_date, bot_app):
                 master_summary = get_master_summary(session, as_of_date, ticker)
 
                 if not master_summary:
-                    logger.warning(f"Master summary is missing for '{ticker}' ticker for on {as_of_date}. SKIPPING.")
+                    logger.warning(
+                        f"Master summary is missing for '{ticker}' ticker for on {as_of_date}. SKIPPING."
+                    )
                     continue
 
                 escaped_summary = escape_markdown_v2(master_summary)
@@ -106,10 +113,14 @@ async def send_master_summaries(as_of_date, bot_app):
                     parse_mode=ParseMode.MARKDOWN_V2,
                     message_thread_id=TOPICS[ticker],
                 )
-                logger.info(f"Sent master summary to '{ticker}' topic, message ID: {message.message_id}.")
+                logger.info(
+                    f"Sent master summary to '{ticker}' topic, message ID: {message.message_id}."
+                )
                 await asyncio.sleep(1)
 
-            logger.info(f"Successfully finished with sending master summaries to {len(TICKERS)} topics.")
+            logger.info(
+                f"Successfully finished with sending master summaries to {len(TICKERS)} topics."
+            )
         except Exception as e:
             error_message = f"Error sending master summary to '{ticker}' topic: {e}"
             logger.error(error_message)
@@ -129,21 +140,22 @@ def get_validator_info(items, active_only: bool, compact_format=True):
         status = status_mapping.get(status_int, "Unknown Status")
         windowUptime = items.get("uptime", {}).get("windowUptime", {})
         uptime = round(windowUptime.get("uptime", 0) * 100, 2) if windowUptime else 0
-        commission_str = items.get("commission", {}).get("commission_rates", {}).get("rate", "0")
+        commission_str = (
+            items.get("commission", {}).get("commission_rates", {}).get("rate", "0")
+        )
         commission = round(float(commission_str) * 100, 2)
-
 
     except Exception as e:
         logger.error(f"Failed to extract metadata from json: {e}")
         logger.error(items)
         raise Exception(e)
 
-    link_to_page = rf"https://testnet.storyscan.app/validators/{operator_address}?tab=profile"
+    link_to_page = (
+        rf"https://testnet.storyscan.app/validators/{operator_address}?tab=profile"
+    )
 
     if compact_format:
-        status_message = (
-            f"<a href='{link_to_page}'>{name}</a> ✅ Status: {status} ⏱ Uptime: {uptime}% 💸 Commission: {commission}%\n"
-        )
+        status_message = f"<a href='{link_to_page}'>{name}</a> ✅ Status: {status} ⏱ Uptime: {uptime}% 💸 Commission: {commission}%\n"
     else:
         status_message = (
             f"<a href='{link_to_page}'>{name}</a>\n"
@@ -165,21 +177,31 @@ async def send_validator_status(update: Update, context: ContextTypes.DEFAULT_TY
 
         response_json = get_response_json(url)
         items = response_json["items"][0]
-        validator_info = get_validator_info(items, active_only=False, compact_format=False)
+        validator_info = get_validator_info(
+            items, active_only=False, compact_format=False
+        )
 
-        await update.message.reply_text(validator_info, parse_mode='HTML', disable_web_page_preview=True)
+        await update.message.reply_text(
+            validator_info, parse_mode="HTML", disable_web_page_preview=True
+        )
     else:
         url = "https://api.testnet.storyscan.app/validators/active"
 
         try:
-            await update.message.reply_text("Requesting info for all active validators...")
+            await update.message.reply_text(
+                "Requesting info for all active validators..."
+            )
 
             all_items = get_response_json(f"{url}")
-            logger.info(f"Got {len(all_items)} validator jsons. Starting to extract metainfo...")
+            logger.info(
+                f"Got {len(all_items)} validator jsons. Starting to extract metainfo..."
+            )
 
             status_messages = []
             for item in all_items:
-                status_message = get_validator_info(item, active_only=True, compact_format=True)
+                status_message = get_validator_info(
+                    item, active_only=True, compact_format=True
+                )
                 if status_message:
                     status_messages.append(status_message)
 
@@ -190,7 +212,9 @@ async def send_validator_status(update: Update, context: ContextTypes.DEFAULT_TY
 
             # Send each chunk
             for chunk in message_chunks:
-                await update.message.reply_text(chunk, parse_mode='HTML', disable_web_page_preview=True)
+                await update.message.reply_text(
+                    chunk, parse_mode="HTML", disable_web_page_preview=True
+                )
                 await asyncio.sleep(1)
             logger.info(f"Succesfully sent validator metainfo.")
         except Exception as e:
@@ -221,9 +245,6 @@ async def get_best_validator(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     uptime = items["uptime"]["windowUptime"]["uptime"] * 100
 
-    health_message = (
-        f"⏱ Uptime: {uptime}%\n"
-        f"⏱ Commission: {commission}\n"
-    )
+    health_message = f"⏱ Uptime: {uptime}%\n" f"⏱ Commission: {commission}\n"
 
     await update.message.reply_text(health_message)

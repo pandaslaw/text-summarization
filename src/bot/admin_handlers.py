@@ -109,8 +109,10 @@ async def send_story_summary(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
         if context.args:
             news_url = " ".join(context.args)
-            prompt = ("You are cryptocurrency expert. Summarize content of an article to create short, "
-                      "concise overview with required amount of details to inform users about daily changes in The Story community.")
+            prompt = (
+                "You are cryptocurrency expert. Summarize content of an article to create short, "
+                "concise overview with required amount of details to inform users about daily changes in The Story community."
+            )
 
             content_summary = summarize_text(news_url, prompt)
 

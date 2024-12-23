@@ -20,8 +20,10 @@ def create_content_summary(session, as_of_date: dt.date, ticker: str):
     articles = get_articles_by_ticker(
         session, as_of_date, ticker, empty_content_summary=True
     )
-    logger.info(f"Found {len(articles)} articles with '{ticker}' ticker and empty content summary. "
-                f"LLM will be called for every link to summarize its content.")
+    logger.info(
+        f"Found {len(articles)} articles with '{ticker}' ticker and empty content summary. "
+        f"LLM will be called for every link to summarize its content."
+    )
 
     for article in articles:
         content_summary = summarize_text(article.news_url, prompt)
@@ -46,8 +48,10 @@ def create_master_summary(session, as_of_date: dt.date, ticker: str):
         empty_content_summary=False,
         empty_master_summary=True,
     )
-    logger.info(f"Found {len(articles)} articles with '{ticker}' ticker, not empty content summary and "
-                f"empty master summary. LLM will be called for every link to summarize its content.")
+    logger.info(
+        f"Found {len(articles)} articles with '{ticker}' ticker, not empty content summary and "
+        f"empty master summary. LLM will be called for every link to summarize its content."
+    )
 
     all_content_summaries_list = [article.content_summary for article in articles]
     all_content_summaries = "\n\n".join(all_content_summaries_list)

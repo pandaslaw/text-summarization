@@ -16,10 +16,10 @@ class DiscordClient(discord.Client):
 
     def __init__(self, bot_app, *, intents: Intents, **options: Any):
         super().__init__(intents=intents, **options)
-        self.bot_app= bot_app
+        self.bot_app = bot_app
 
     async def on_ready(self):
-        print(f'Logged in as {self.user}')
+        print(f"Logged in as {self.user}")
         await self.fetch_and_summarize()
 
     async def fetch_and_summarize(self):
@@ -34,7 +34,9 @@ class DiscordClient(discord.Client):
         messages = await channel.history(after=yesterday, limit=100).flatten()
 
         # Concatenate all messages into a single string for summarization
-        content = "\n".join([message.content for message in messages if message.content])
+        content = "\n".join(
+            [message.content for message in messages if message.content]
+        )
         if not content:
             print("No messages found to summarize.")
             return
@@ -45,7 +47,6 @@ class DiscordClient(discord.Client):
 
         # Send summary to Telegram
         await self.send_summary_to_telegram(summary)
-
 
     async def send_summary_to_telegram(self, summary):
         try:
@@ -69,4 +70,3 @@ async def run_scheduled_task(bot_app):
 
     # After the client is running, you can fetch and summarize
     await discord_client.fetch_and_summarize()
-

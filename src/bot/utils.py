@@ -13,9 +13,7 @@ def get_response_json(url: str):
     response = requests.get(url)
 
     if response is not None and response.status_code != 200:
-        logger.error(
-            f"Error on requesting 'url': {response.content}"
-        )
+        logger.error(f"Error on requesting 'url': {response.content}")
         raise Exception(response.content)
 
     response_json = response.json()
