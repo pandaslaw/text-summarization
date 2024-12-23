@@ -1,19 +1,18 @@
-# syntax=docker/dockerfile:1
+# Use an official Python runtime as a parent image
+FROM python:3.11-slim
 
-# Install base Python image
-FROM python:3.8-slim-buster
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
 
-# Set working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy local files to the container
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the project files
 COPY . .
 
-# Install dependencies
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
-
-# Informs Docker that the container listens on port 4001
-EXPOSE 8888
-
-
-CMD ["python", "./main.py"]
+# Command to run the bot
+CMD ["python", "-m", "main"]
