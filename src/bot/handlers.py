@@ -18,7 +18,6 @@ from src.config.config import app_settings
 from src.config.constants import TICKERS, TOPICS
 from src.database.connection import create_session
 from src.database.database import get_master_summary
-from src.run_bot import bot
 
 logger = getLogger(__name__)
 
@@ -119,7 +118,7 @@ async def send_master_summaries(as_of_date, bot_app):
 
                 escaped_summary = escape_markdown_v2(master_summary)
 
-                message = await bot.send_message(
+                message = await bot_app.bot.send_message(
                     chat_id=app_settings.GROUP_CHAT_ID,
                     text=escaped_summary,
                     parse_mode=ParseMode.MARKDOWN_V2,
