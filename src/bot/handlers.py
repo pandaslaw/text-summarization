@@ -12,7 +12,7 @@ from src.bot.utils import (
     escape_markdown_v2,
     notify_admin_on_error,
     get_response_json,
-    split_message,
+    split_message, load_static_info_from_yaml,
 )
 from src.config.config import app_settings
 from src.config.constants import TICKERS, TOPICS
@@ -32,14 +32,26 @@ def register_handlers(app: Application):
     app.add_handler(CommandHandler("create_topic", create_topic))
     app.add_handler(CommandHandler("get_topics", get_topics))
     app.add_handler(CommandHandler("validator_status", send_validator_status))
+    app.add_handler(CommandHandler("info", send_info))
     # app.add_handler(CommandHandler("best_validator", get_best_validator))
 
 
 async def start(update: Update, context: CallbackContext):
     """Handle the /start command."""
     await update.message.reply_text(
-        "Welcome to the News Summary Bot! Use /subscribe to subscribe to a channel."
+        "📊 <b>Welcome to the Crypto Daily Brief Bot</b> 🧳\n\n\n"
+        "Use <code>/validator_status</code> to get a list of all active validators with their status, uptime, and commission.\n\n"
+        "Use <code>/validator_status &lt;validator_name&gt;</code> to get the status, uptime, and commission of a specific validator.\n\n"
+        "Use <code>/info</code> to learn more about Story Protocol (STORY)",
+        parse_mode="HTML"
     )
+
+
+async def send_info(update: Update, context: CallbackContext):
+    """Handle the /start command."""
+    text = load_static_info_from_yaml("static_info.yaml", "story_protocol_info")
+    if text:
+        await update.message.reply_text(text, disable_web_page_preview=True)
 
 
 async def create_topic(update: Update, context: ContextTypes.DEFAULT_TYPE):

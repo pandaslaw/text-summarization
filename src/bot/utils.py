@@ -1,6 +1,8 @@
+import os
 from logging import getLogger
 
 import requests
+import yaml
 from telegram.error import TelegramError
 from telegram.ext import CallbackContext
 
@@ -91,3 +93,14 @@ def split_message(message: str, max_length: int = 4096) -> list:
         chunks.append(current_chunk)
 
     return chunks
+
+def load_static_info_from_yaml(yaml_file, field: str):
+    """Load prompts from the specified YAML file."""
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+    docs_dir = "data"
+    yaml_file_full_path = os.path.join(root_dir, docs_dir, yaml_file)
+
+    with open(yaml_file_full_path, "r", encoding="utf-8") as file:
+        prompts = yaml.safe_load(file)
+
+    return prompts.get(field, "")
