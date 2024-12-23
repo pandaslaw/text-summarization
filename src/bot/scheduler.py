@@ -13,6 +13,7 @@ from src.services.summarizer import (
     pull_articles_and_save_articles,
     create_and_save_summaries,
 )
+from src.services.twitter_client import run_twitter_summarizer
 
 logger = getLogger(__name__)
 
@@ -61,16 +62,32 @@ def setup_discord_daily_summarize_scheduler(bot_app):
     scheduler.add_job(
         run_scheduled_task,
         CronTrigger(
-            hour=11, minute=0
+            hour=9, minute=0
         ),  # Adjust time as needed, e.g. 'interval', minutes=5,
         kwargs={"bot_app": bot_app},
-        id="daily_summary",
+        id="daily_discord_summary",
         replace_existing=True,
     )
 
     scheduler.start()
-    logger.info("Summarize scheduler initialized and daily task scheduled at 3:00 AM UTC.")
+    logger.info("Summarize scheduler initialized and daily task scheduled at 9:00 AM UTC.")
 
+def setup_twitter_daily_summarize_scheduler(bot_app):
+    """Set up the scheduler and register tasks."""
+    scheduler = AsyncIOScheduler()
+
+    scheduler.add_job(
+        run_twitter_summarizer,
+        CronTrigger(
+            hour=8, minute=0
+        ),  # Adjust time as needed, e.g. 'interval', minutes=5,
+        kwargs={"bot_app": bot_app},
+        id="daily_twitter_summary",
+        replace_existing=True,
+    )
+
+    scheduler.start()
+    logger.info("Summarize scheduler initialized and daily task scheduled at 8:00 AM UTC.")
 
 
 async def pull_todays_articles(bot_app):

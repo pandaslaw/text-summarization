@@ -17,3 +17,4 @@ pytz
 python-dateutil
 schedule
 discord.py
+tweepy
