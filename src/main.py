@@ -21,7 +21,7 @@ async def main():
     await bot_app.initialize()
 
     # Register all handlers
-    register_handlers(bot_app)
+    await register_handlers(bot_app)
     register_admin_handlers(bot_app)
 
     setup_article_pull_scheduler(bot_app)

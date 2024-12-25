@@ -4,7 +4,7 @@ import sys
 import traceback
 from logging import getLogger
 
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
 from telegram.constants import ParseMode
 from telegram.ext import CallbackContext, ContextTypes, CommandHandler, Application
 
@@ -12,7 +12,8 @@ from src.bot.utils import (
     escape_markdown_v2,
     notify_admin_on_error,
     get_response_json,
-    split_message, load_static_info_from_yaml,
+    split_message,
+    load_static_info_from_yaml,
 )
 from src.config.config import app_settings
 from src.config.constants import TICKERS, TOPICS
@@ -25,24 +26,62 @@ logger = getLogger(__name__)
 APP_START_TIME = dt.datetime.now()
 
 
-def register_handlers(app: Application):
+async def register_handlers(app: Application):
     """Register all command and message handlers."""
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("create_topic", create_topic))
     app.add_handler(CommandHandler("get_topics", get_topics))
     app.add_handler(CommandHandler("validator_status", send_validator_status))
+    app.add_handler(CommandHandler("join_the_channel", join_group))
     app.add_handler(CommandHandler("info", send_info))
-    # app.add_handler(CommandHandler("best_validator", get_best_validator))
+
+    commands = [
+        BotCommand("start", "Start interacting with the bot"),
+        BotCommand(
+            "validator_status",
+            "Get a list of all active validators or pass <name> to get info for for the specific validator.",
+        ),
+        BotCommand(
+            "join_the_channel",
+            "Join Crypto Daily Brief channel to get daily crypto news summaries.",
+        ),
+        BotCommand("info", "Learn more about Story Protocol (STORY)"),
+    ]
+    await app.bot.set_my_commands(commands)
 
 
 async def start(update: Update, context: CallbackContext):
     """Handle the /start command."""
+    group_invite_link = "https://t.me/cryptodailybrief"
+    message_text = (
+        "🚀 Join our Crypto Daily Brief channel to stay ahead!\n\n\n"
+        "📰 <b>Daily Crypto News Summaries:</b> Get concise, organized updates on major cryptocurrencies, sorted by ticker.\n\n"
+        "💬 <b>Story Protocol (STORY) Updates:</b> Stay informed on the latest news and insights.\n\n"
+        "✨ <b>Use Bot commands</b> to check Story Validator Status and info."
+    )
+
+    keyboard = [[InlineKeyboardButton("Join the Channel", url=group_invite_link)]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
     await update.message.reply_text(
-        "📊 <b>Welcome to the Crypto Daily Brief Bot</b> 🧳\n\n\n"
-        "Use <code>/validator_status</code> to get a list of all active validators with their status, uptime, and commission.\n\n"
-        "Use <code>/validator_status &lt;validator_name&gt;</code> to get the status, uptime, and commission of a specific validator.\n\n"
-        "Use <code>/info</code> to learn more about Story Protocol (STORY)",
-        parse_mode="HTML"
+        message_text, reply_markup=reply_markup, parse_mode="HTML"
+    )
+
+
+async def join_group(update: Update, context: CallbackContext):
+    """Send a message with a button to join the group."""
+    group_invite_link = "https://t.me/cryptodailybrief"
+    message_text = (
+        "🚀 Join our Crypto Daily Brief channel to stay ahead!\n\n\n"
+        "📰 <b>Daily Crypto News Summaries:</b> Get concise, organized updates on major cryptocurrencies, sorted by ticker.\n\n"
+        "💬 <b>Story Protocol (STORY) Updates:</b> Stay informed on the latest news and insights.\n\n"
+    )
+
+    keyboard = [[InlineKeyboardButton("Join the Channel", url=group_invite_link)]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text(
+        message_text, reply_markup=reply_markup, parse_mode="HTML"
     )
 
 
