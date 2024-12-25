@@ -4,10 +4,10 @@ This file contains functions to get/download/organize/save data from cryptonews 
 
 import argparse
 import datetime as dt
+from logging import getLogger
 
 import requests
 from bs4 import BeautifulSoup
-from loguru import logger
 
 from src.config import app_settings
 from src.database import (
@@ -16,6 +16,8 @@ from src.database import (
     save_articles_to_db,
 )
 from src.summarization.utils.utils import get_start_date
+
+logger = getLogger(__name__)
 
 
 def get_article_content(news_url: str) -> str:

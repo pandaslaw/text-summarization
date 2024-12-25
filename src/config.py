@@ -1,10 +1,12 @@
 import os
+from logging import getLogger
 from typing import List
 
 import yaml
 from dotenv import load_dotenv
-from loguru import logger
 from pydantic.v1 import BaseSettings
+
+logger = getLogger(__name__)
 
 
 class AppSettings(BaseSettings):
@@ -54,15 +56,10 @@ app_settings.HUGGINGFACE_HEADERS = {
     "Authorization": f"Bearer {app_settings.HUGGINGFACE_API_KEY}"
 }
 
-
 logger.info(f"CONFIG (DEBUG_MODE): {app_settings.DEBUG_MODE}")
 logger.info(f"CONFIG (LANGUAGE_MODEL): {app_settings.LANGUAGE_MODEL}")
 logger.info(f"CONFIG (GROUP_CHAT_ID): {app_settings.GROUP_CHAT_ID}")
 logger.info(f"CONFIG (ADMIN_USER_IDS): {app_settings.ADMIN_USER_IDS}")
-logger.info(
-    f"CONFIG (CONTENT_SUMMARY_PROMPT): {app_settings.CONTENT_SUMMARY_PROMPT}"
-)
-logger.info(
-    f"CONFIG (MASTER_SUMMARY_PROMPT): {app_settings.MASTER_SUMMARY_PROMPT}"
-)
+logger.info(f"CONFIG (CONTENT_SUMMARY_PROMPT): {app_settings.CONTENT_SUMMARY_PROMPT}")
+logger.info(f"CONFIG (MASTER_SUMMARY_PROMPT): {app_settings.MASTER_SUMMARY_PROMPT}")
 logger.info("-------------ENV VARIABLES INITIALIZATION FINISHED-------------\n\n")

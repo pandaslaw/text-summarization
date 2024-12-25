@@ -5,12 +5,13 @@ and updates master_summary field of each db record with the generated summary.
 
 import argparse
 import datetime as dt
-
-from loguru import logger
+from logging import getLogger
 
 from src.config import app_settings
 from src.database import create_session, get_articles_by_ticker
 from src.summarization.utils.utils import get_start_date, summarize_text
+
+logger = getLogger(__name__)
 
 
 def run(session, as_of_date: dt.date, ticker: str) -> str:

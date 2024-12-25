@@ -1,7 +1,7 @@
 import datetime as dt
+from logging import getLogger
 from typing import List
 
-from loguru import logger
 from sqlalchemy import Integer, Date, and_, or_
 from sqlalchemy import String
 from sqlalchemy import create_engine
@@ -10,6 +10,8 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import sessionmaker
 
 from src.config import app_settings
+
+logger = getLogger(__name__)
 
 Base = declarative_base()
 

@@ -1,14 +1,15 @@
-from telegram import Update, ForumTopic
+import datetime as dt
+from logging import getLogger
+
 from telegram.constants import ParseMode
 
 from src.bot.utils import escape_markdown_v2
 from src.config import app_settings
 from src.constants import TICKERS, TOPICS
 from src.database import create_session, get_master_summary
-import datetime as dt
-
 from src.run_bot import bot
-from src.summarization.utils.utils import logger
+
+logger = getLogger(__name__)
 
 
 async def send_master_summaries():

@@ -1,14 +1,16 @@
+from logging import getLogger
+
 from telegram import Bot
 from telegram.ext import CommandHandler, ApplicationBuilder
 
 from src.bot.handlers.start_handler import start, create_topic, get_topics
 from src.config import app_settings
 
+logger = getLogger(__name__)
 
 # Initialize clients
 bot = Bot(token=app_settings.TELEGRAM_BOT_TOKEN)
 app = ApplicationBuilder().token(app_settings.TELEGRAM_BOT_TOKEN).build()
-
 
 if __name__ == "__main__":
     # Register commands

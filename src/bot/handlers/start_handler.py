@@ -1,5 +1,9 @@
+from logging import getLogger
+
 from telegram import Update
 from telegram.ext import CallbackContext, ContextTypes
+
+logger = getLogger(__name__)
 
 
 async def start(update: Update, context: CallbackContext):

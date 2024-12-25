@@ -2,15 +2,17 @@ import argparse
 import datetime as dt
 import json
 import os
+from logging import getLogger
 
 import streamlit as st
-from loguru import logger
 
 from src.config import app_settings
 from src.summarization.utils.utils import (
     get_master_summary_file_path,
     summarize_text,
 )
+
+logger = getLogger(__name__)
 
 
 def run(as_of_date: dt.date, data_source_file_name: str = None) -> str:
