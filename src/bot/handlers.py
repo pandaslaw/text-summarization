@@ -52,7 +52,7 @@ async def register_handlers(app: Application):
 
 async def start(update: Update, context: CallbackContext):
     """Handle the /start command."""
-    group_invite_link = "https://t.me/cryptodailybrief"
+    group_invite_link = "https://t.me/cryptodailybrief/192"
     message_text = (
         "🚀 Join our Crypto Daily Brief channel to stay ahead!\n\n\n"
         "📰 <b>Daily Crypto News Summaries:</b> Get concise, organized updates on major cryptocurrencies, sorted by ticker.\n\n"
@@ -70,7 +70,7 @@ async def start(update: Update, context: CallbackContext):
 
 async def join_group(update: Update, context: CallbackContext):
     """Send a message with a button to join the group."""
-    group_invite_link = "https://t.me/cryptodailybrief"
+    group_invite_link = "https://t.me/cryptodailybrief/192"
     message_text = (
         "🚀 Join our Crypto Daily Brief channel to stay ahead!\n\n\n"
         "📰 <b>Daily Crypto News Summaries:</b> Get concise, organized updates on major cryptocurrencies, sorted by ticker.\n\n"
