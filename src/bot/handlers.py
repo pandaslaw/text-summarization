@@ -34,6 +34,7 @@ async def register_handlers(app: Application):
     app.add_handler(CommandHandler("validator_status", send_validator_status))
     app.add_handler(CommandHandler("join_the_channel", join_group))
     app.add_handler(CommandHandler("info", send_info))
+    app.add_handler(CommandHandler("getchatid", get_chat_id))
 
     commands = [
         BotCommand("start", "Start interacting with the bot"),
@@ -46,6 +47,7 @@ async def register_handlers(app: Application):
             "Join Crypto Daily Brief channel to get daily crypto news summaries.",
         ),
         BotCommand("info", "Learn more about Story Protocol (STORY)"),
+        BotCommand("getchatid", "Get the chat ID of the current chat"),
     ]
     await app.bot.set_my_commands(commands)
 
@@ -298,3 +300,9 @@ async def get_best_validator(update: Update, context: ContextTypes.DEFAULT_TYPE)
     health_message = f"⏱ Uptime: {uptime}%\n" f"⏱ Commission: {commission}\n"
 
     await update.message.reply_text(health_message)
+
+
+async def get_chat_id(update: Update, context: CallbackContext):
+    """Get the chat ID of the current chat."""
+    chat_id = update.effective_chat.id
+    await update.message.reply_text(f"Chat ID: {chat_id}")

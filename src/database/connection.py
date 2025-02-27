@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.config.config import app_settings
-from src.database.models import CryptonewsArticlesDump, Base
+from src.database.models.summary import CryptonewsArticlesDump, Base
 
 logger = getLogger(__name__)
 

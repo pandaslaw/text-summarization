@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 from src.config.config import app_settings
 from src.database.database import save_articles_to_db
-from src.database.models import CryptonewsArticlesDump
+from src.database.models.summary import CryptonewsArticlesDump
 from src.services.datetime_util import DatetimeUtil
 
 logger = getLogger(__name__)

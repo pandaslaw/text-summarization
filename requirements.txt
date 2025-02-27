@@ -18,3 +18,5 @@ python-dateutil
 schedule
 discord.py
 tweepy
+google-api-python-client==2.108.0
+youtube-transcript-api==0.6.1

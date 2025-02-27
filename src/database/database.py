@@ -4,7 +4,8 @@ from typing import List
 
 from sqlalchemy import and_, or_
 
-from src.database.models import CryptonewsArticlesDump
+from src.database.models.summary import CryptonewsArticlesDump
+
 
 logger = getLogger(__name__)
 

@@ -14,6 +14,7 @@ from src.services.summarizer import (
     create_and_save_summaries,
 )
 from src.services.twitter_client import run_twitter_summarizer
+from src.services.youtube_summarizer import YouTubeSummarizer
 
 logger = getLogger(__name__)
 
@@ -94,6 +95,24 @@ def setup_twitter_daily_summarize_scheduler(bot_app):
     )
 
 
+def setup_youtube_summarize_scheduler(bot_app):
+    """Set up the scheduler for YouTube video summarization."""
+    scheduler = AsyncIOScheduler()
+    
+    # Schedule for 5 AM London time
+    scheduler.add_job(
+        process_youtube_videos,
+        trigger='cron',
+        hour=5,  # 5 AM London time
+        minute=0,
+        kwargs={'bot_app': bot_app},
+        name='youtube_summarizer'
+    )
+    
+    scheduler.start()
+    logger.info("YouTube summarization scheduler started")
+
+
 async def pull_todays_articles(bot_app):
     """Task to pull and save articles."""
     as_of_date = DatetimeUtil.utc_now().date()
@@ -150,3 +169,17 @@ async def generate_master_summaries(bot_app):
             logger.error(message)
 
         await notify_admin_on_error(bot_app.bot, "\n\n".join(messages))
+
+
+async def process_youtube_videos(bot_app):
+    """Process YouTube videos and send summaries."""
+    try:
+        session = create_session()
+        summarizer = YouTubeSummarizer(session, bot_app)
+        await summarizer.add_channel("https://www.youtube.com/@CoinBureau")
+        await summarizer.add_channel("https://www.youtube.com/@TheBitBoyX")
+        await summarizer.process_all_channels()
+    except Exception as e:
+        logger.error(f"Error in YouTube video processing: {e}")
+    finally:
+        session.close()

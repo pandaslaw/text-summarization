@@ -40,6 +40,10 @@ class AppSettings(BaseSettings):
     TWITTER_ACCESS_TOKEN: str
     TWITTER_ACCESS_TOKEN_SECRET: str
 
+    YOUTUBE_API_KEY: str
+    YOUTUBE_GROUP_CHAT_ID: int
+    YOUTUBE_SUMMARY_PROMPT: str = None
+
     # Prompts loaded from YAML
     CONTENT_SUMMARY_PROMPT: str = None
     MASTER_SUMMARY_PROMPT: str = None
@@ -55,7 +59,7 @@ class AppSettings(BaseSettings):
 
         self.CONTENT_SUMMARY_PROMPT = prompts.get("content_summary_prompt", "")
         self.MASTER_SUMMARY_PROMPT = prompts.get("master_summary_prompt", "")
-
+        self.YOUTUBE_SUMMARY_PROMPT = prompts.get("youtube_summary_prompt", "")
 
 logger.info("Loading environment variables from .env file.")
 load_dotenv()
@@ -71,4 +75,7 @@ logger.info(f"CONFIG (GROUP_CHAT_ID): {app_settings.GROUP_CHAT_ID}")
 logger.info(f"CONFIG (ADMIN_USER_IDS): {app_settings.ADMIN_USER_IDS}")
 logger.info(f"CONFIG (CONTENT_SUMMARY_PROMPT): {app_settings.CONTENT_SUMMARY_PROMPT}")
 logger.info(f"CONFIG (MASTER_SUMMARY_PROMPT): {app_settings.MASTER_SUMMARY_PROMPT}")
+logger.info(f"CONFIG (YOUTUBE_API_KEY): {app_settings.YOUTUBE_API_KEY}")
+logger.info(f"CONFIG (YOUTUBE_GROUP_CHAT_ID): {app_settings.YOUTUBE_GROUP_CHAT_ID}")
+logger.info(f"CONFIG (YOUTUBE_SUMMARY_PROMPT): {app_settings.YOUTUBE_SUMMARY_PROMPT}")
 logger.info("-------------ENV VARIABLES INITIALIZATION FINISHED-------------\n\n")
