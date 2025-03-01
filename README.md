@@ -20,8 +20,29 @@ To show list of databases:
 
 > ./run-all.cmd  
 
+## Database Setup
+
+The project uses PostgreSQL as its database. To set up the database and tables:
+
+1. Make sure PostgreSQL is installed and running
+2. Navigate to the `sql` directory
+3. Run `setup_database.bat`
+
+The setup script will:
+- Try to read database credentials from your `.env` file
+- If not found, prompt you for the necessary information
+- Create the database and all required tables
+- Set up proper indexes and permissions
+
+You can set the following environment variables before running the script to avoid prompts:
+- `DB_USER`: PostgreSQL username (default: postgres)
+- `DB_PASSWORD`: PostgreSQL password
+- `DB_HOST`: PostgreSQL host (default: localhost)
+- `DB_PORT`: PostgreSQL port (default: 5432)
+
+Alternatively, ensure these values are set in your `.env` file.
+
 ### Docker
 To run web app using Docker:
 > docker build -t python-docker-image .  
 > docker run python-docker-image
-
