@@ -7,6 +7,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from src.bot.handlers import send_master_summaries
 from src.bot.utils import notify_admin_on_error
+from src.database.connection import create_session
 from src.services.datetime_util import DatetimeUtil
 from src.services.discord_client import run_scheduled_task
 from src.services.summarizer import (

@@ -6,6 +6,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import TextFormatter
+import asyncio
 
 from src.config.config import app_settings
 from src.database.models.youtube import YouTubeChannel, YouTubeVideo
@@ -17,7 +18,12 @@ class YouTubeClient:
         self.youtube = build('youtube', 'v3', developerKey=app_settings.YOUTUBE_API_KEY)
         self.transcript_formatter = TextFormatter()
 
-    def get_channel_info(self, channel_url: str) -> Optional[Tuple[str, str, str]]:
+    async def _execute_youtube_api(self, request):
+        """Execute YouTube API request asynchronously."""
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, request.execute)
+
+    async def get_channel_info(self, channel_url: str) -> Optional[Tuple[str, str, str]]:
         """
         Get channel ID, name and description from channel URL.
         Returns tuple of (channel_id, name, description) or None if not found.
@@ -29,11 +35,13 @@ class YouTubeClient:
             elif 'youtube.com/c/' in channel_url or 'youtube.com/@' in channel_url:
                 # For custom URLs, we need to search for the channel
                 channel_name = channel_url.split('/')[-1].replace('@', '')
-                search_response = self.youtube.search().list(
-                    q=channel_name,
-                    type='channel',
-                    part='id'
-                ).execute()
+                search_response = await self._execute_youtube_api(
+                    self.youtube.search().list(
+                        q=channel_name,
+                        type='channel',
+                        part='id'
+                    )
+                )
                 
                 if not search_response['items']:
                     return None
@@ -44,10 +52,12 @@ class YouTubeClient:
                 return None
 
             # Get channel details
-            channel_response = self.youtube.channels().list(
-                part='snippet',
-                id=channel_id
-            ).execute()
+            channel_response = await self._execute_youtube_api(
+                self.youtube.channels().list(
+                    part='snippet',
+                    id=channel_id
+                )
+            )
 
             if not channel_response['items']:
                 return None
@@ -63,21 +73,23 @@ class YouTubeClient:
             logger.error(f"Error getting channel info: {e}")
             return None
 
-    def get_recent_videos(self, channel_id: str, after_date: datetime) -> List[dict]:
+    async def get_recent_videos(self, channel_id: str, after_date: datetime) -> List[dict]:
         """Get videos published after specified date for a channel."""
         try:
             # Convert date to RFC 3339 format
             after_date_str = after_date.isoformat('T') + 'Z'
 
             # Get videos
-            search_response = self.youtube.search().list(
-                channelId=channel_id,
-                order='date',
-                type='video',
-                part='id,snippet',
-                publishedAfter=after_date_str,
-                maxResults=50  # Adjust as needed
-            ).execute()
+            search_response = await self._execute_youtube_api(
+                self.youtube.search().list(
+                    channelId=channel_id,
+                    order='date',
+                    type='video',
+                    part='id,snippet',
+                    publishedAfter=after_date_str,
+                    maxResults=50  # Adjust as needed
+                )
+            )
 
             videos = []
             for item in search_response.get('items', []):
@@ -99,12 +111,13 @@ class YouTubeClient:
             logger.error(f"Error getting videos for channel {channel_id}: {e}")
             return []
 
-    def get_video_transcript(self, video_id: str) -> Optional[str]:
+    async def get_video_transcript(self, video_id: str) -> Optional[str]:
         """Get transcript for a video."""
         try:
-            transcript_list = YouTubeTranscriptApi.get_transcript(
-                video_id,
-                languages=['en']  # Prefer English
+            loop = asyncio.get_event_loop()
+            transcript_list = await loop.run_in_executor(
+                None,
+                lambda: YouTubeTranscriptApi.get_transcript(video_id, languages=['en'])
             )
             
             # Format transcript to plain text
@@ -114,13 +127,13 @@ class YouTubeClient:
             logger.error(f"Error getting transcript for video {video_id}: {e}")
             return None
 
-    def process_channel_videos(self, channel: YouTubeChannel, session) -> List[YouTubeVideo]:
+    async def process_channel_videos(self, channel: YouTubeChannel, session) -> List[YouTubeVideo]:
         """
         Process videos for a channel published in the last 24 hours.
         Returns list of processed videos.
         """
         after_date = datetime.utcnow() - timedelta(days=1)
-        videos = self.get_recent_videos(channel.channel_id, after_date)
+        videos = await self.get_recent_videos(channel.channel_id, after_date)
         
         processed_videos = []
         for video_data in videos:
@@ -133,7 +146,7 @@ class YouTubeClient:
                 continue
 
             # Get transcript
-            transcript = self.get_video_transcript(video_data['video_id'])
+            transcript = await self.get_video_transcript(video_data['video_id'])
             
             # Create new video
             video = YouTubeVideo(

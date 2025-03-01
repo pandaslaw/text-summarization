@@ -20,7 +20,7 @@ class YouTubeSummarizer:
 
     async def add_channel(self, channel_url: str) -> Optional[YouTubeChannel]:
         """Add a new YouTube channel to monitor."""
-        channel_info = self.youtube_client.get_channel_info(channel_url)
+        channel_info = await self.youtube_client.get_channel_info(channel_url)
         if not channel_info:
             return None
 
@@ -104,7 +104,7 @@ class YouTubeSummarizer:
         for channel in active_channels:
             try:
                 # Get and process new videos
-                new_videos = self.youtube_client.process_channel_videos(channel, self.session)
+                new_videos = await self.youtube_client.process_channel_videos(channel, self.session)
                 
                 for video in new_videos:
                     if self.process_video(video):
