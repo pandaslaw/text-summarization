@@ -1,48 +1,92 @@
-# News Summarizer
+# News & YouTube Summarizer Bot
 
-A dynamic app that summarizes essential news pieces related to cryptocurrencies and delivers updates to users either continuously or at specified intervals. Next to news and reports, it integrates insights from on-chain data and technical analysis.
+A dynamic Telegram bot that summarizes both cryptocurrency news and YouTube videos from selected channels. The bot delivers concise summaries to dedicated Telegram groups, making it easy to stay updated with the latest content.
+
+## Features
+
+### Crypto News Summaries
+- Automatically summarizes cryptocurrency news articles
+- Delivers daily updates to a dedicated Telegram group
+- Integrates insights from on-chain data and technical analysis
+
+### YouTube Channel Summaries
+- Monitors selected YouTube channels for new videos
+- Creates AI-powered summaries of video content
+- Organizes summaries by channel in topic-based discussions
+- Posts summaries with direct links to original videos
 
 ## Project Setup
 
-Install postgres  
+### Prerequisites
+- Python 3.8+
+- PostgreSQL
+- Telegram Bot Token
+- YouTube API Key
 
-Log in to postgres interactive terminal open command line and type:
-> psql -U postgres   
+### Environment Setup
 
-To create a new database type in terminal:
-> create database test;
+1. Create `.env` file based on `.env.sample`
 
-To show list of databases:
-> \l
+### Database Setup
 
-1. Create .env file. Sample configs are in .env.sample file.
-2. To run the application in project directory run  
-
-> ./run-all.cmd  
-
-## Database Setup
-
-The project uses PostgreSQL as its database. To set up the database and tables:
-
-1. Make sure PostgreSQL is installed and running
-2. Navigate to the `sql` directory
+1. Install PostgreSQL
+2. Navigate to `sql` directory
 3. Run `setup_database.bat`
 
 The setup script will:
-- Try to read database credentials from your `.env` file
-- If not found, prompt you for the necessary information
-- Create the database and all required tables
-- Set up proper indexes and permissions
+- Create database and required tables
+- Set up indexes for better performance
+- Configure necessary permissions
 
-You can set the following environment variables before running the script to avoid prompts:
-- `DB_USER`: PostgreSQL username (default: postgres)
-- `DB_PASSWORD`: PostgreSQL password
-- `DB_HOST`: PostgreSQL host (default: localhost)
-- `DB_PORT`: PostgreSQL port (default: 5432)
+### Running the Application
 
-Alternatively, ensure these values are set in your `.env` file.
+In the project directory, run:
+```bash
+./run-all.cmd
+```
 
-### Docker
-To run web app using Docker:
-> docker build -t python-docker-image .  
-> docker run python-docker-image
+## Telegram Bot Setup
+
+1. Create a Telegram Supergroup
+2. Enable Topics in group settings
+3. Add the bot as administrator with permissions:
+   - Send Messages
+   - Edit Messages
+   - Delete Messages
+   - Pin Messages
+   - Manage Topics
+4. Use `/getchatid` command to get the group ID
+5. Update `YOUTUBE_GROUP_CHAT_ID` in `.env`
+
+## Bot Commands
+
+- `/start` - Start interacting with the bot
+- `/getchatid` - Get current chat ID
+- `/info` - Get bot information
+- `/join_the_channel` - Join Crypto Daily Brief channel
+
+## Docker Support
+
+To run using Docker:
+```bash
+docker build -t python-docker-image .
+docker run python-docker-image
+```
+
+## Project Structure
+
+```
+text-summarization/
+├── sql/                    # Database scripts
+├── src/
+│   ├── bot/               # Telegram bot handlers
+│   ├── config/            # Configuration settings
+│   ├── database/          # Database models
+│   │   └── models/        
+│   └── services/          # Core services
+│       ├── youtube_client.py
+│       └── youtube_summarizer.py
+├── .env                   # Environment variables
+└── requirements.txt       # Python dependencies
+```
+
