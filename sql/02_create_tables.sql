@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS youtube_channels (
     channel_id VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
     description TEXT,
+    topic_id INTEGER,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     is_active BOOLEAN DEFAULT TRUE,
     CONSTRAINT youtube_channels_channel_id_key UNIQUE (channel_id)

@@ -3,6 +3,7 @@ import datetime as dt
 import sys
 import traceback
 from logging import getLogger
+from random import randint
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
 from telegram.constants import ParseMode
@@ -19,6 +20,7 @@ from src.config.config import app_settings
 from src.config.constants import TICKERS, TOPICS
 from src.database.connection import create_session
 from src.database.database import get_master_summary
+from src.database.models.youtube import YouTubeChannel
 
 logger = getLogger(__name__)
 
@@ -30,6 +32,7 @@ async def register_handlers(app: Application):
     """Register all command and message handlers."""
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("create_topic", create_topic))
+    app.add_handler(CommandHandler("create_channel_topic", create_channel_topic))
     app.add_handler(CommandHandler("get_topics", get_topics))
     app.add_handler(CommandHandler("validator_status", send_validator_status))
     app.add_handler(CommandHandler("join_the_channel", join_group))
@@ -38,6 +41,7 @@ async def register_handlers(app: Application):
 
     commands = [
         BotCommand("start", "Start interacting with the bot"),
+        BotCommand("create_channel_topic", "Create a topic for a YouTube channel"),
         BotCommand(
             "validator_status",
             "Get a list of all active validators or pass <name> to get info for for the specific validator.",
@@ -113,6 +117,54 @@ async def create_topic(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"Failed to create topic: {str(e)}")
     else:
         await update.message.reply_text("Please provide a topic name.")
+
+
+async def create_channel_topic(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """Create a topic for a YouTube channel and store its ID."""
+    if not update.message or not update.message.chat.is_forum:
+        await update.message.reply_text(
+            "This command can only be used in a forum group!"
+        )
+        return
+
+    args = context.args
+    if not args or len(args) < 2:
+        await update.message.reply_text(
+            "Please provide channel ID and name.\n"
+            "Usage: /create_channel_topic <channel_id> <channel_name>"
+        )
+        return
+
+    channel_id = args[0]
+    channel_name = " ".join(args[1:])
+
+    try:
+        # Create the topic
+        new_topic = await context.bot.create_forum_topic(
+            chat_id=update.message.chat.id,
+            name=channel_name,
+            icon_color=randint(0x6FB9F0, 0x8B72FF),
+        )
+
+        # Store the topic ID in the database
+        with create_session() as session:
+            # channel = session.query(YouTubeChannel).filter_by(channel_id=channel_id).first()
+            channel = session.query(YouTubeChannel).filter_by(name=channel_name).first()
+            if channel:
+                channel.topic_id = new_topic.message_thread_id
+                session.commit()
+                await update.message.reply_text(
+                    f"Created topic '{channel_name}' and stored ID for channel {channel_id}"
+                )
+            else:
+                await update.message.reply_text(
+                    f"Channel {channel_id} is already exist in database"
+                )
+
+    except Exception as e:
+        await update.message.reply_text(f"Error creating topic: {str(e)}")
 
 
 async def get_topics(update: Update, context: ContextTypes.DEFAULT_TYPE):

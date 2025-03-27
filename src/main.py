@@ -9,6 +9,7 @@ from src.bot.scheduler import (
     setup_article_pull_scheduler,
     setup_summarize_scheduler,
     setup_youtube_summarize_scheduler,
+    process_youtube_videos,
 )
 from src.bot.utils import error_handler
 from src.config.config import app_settings
@@ -28,9 +29,10 @@ async def main():
     await register_handlers(bot_app)
     register_admin_handlers(bot_app)
 
-    setup_article_pull_scheduler(bot_app)
-    setup_summarize_scheduler(bot_app)
-    setup_youtube_summarize_scheduler(bot_app)
+    # setup_article_pull_scheduler(bot_app)
+    # setup_summarize_scheduler(bot_app)
+    # setup_youtube_summarize_scheduler(bot_app)
+    await process_youtube_videos(bot_app)
 
     bot_app.add_error_handler(error_handler)
 
